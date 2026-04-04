@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaron Bisla</title>
+    <meta name="description" content="Aaron Bisla — photographer and creative. Film, digital, and everything in between.">
+    <meta property="og:title" content="Aaron Bisla">
+    <meta property="og:description" content="Photographer and creative. Film, digital, and everything in between.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aaronbisla.com">
+    <link rel="canonical" href="https://aaronbisla.com">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-weight: 300;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* -- Header -- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 1;
+        }
+
+        /* -- Hero -- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('images/DSC00143-9d1ac48a-2500.jpg') center/cover no-repeat;
+            filter: brightness(0.4);
+            transform: scale(1.05);
+            transition: transform 8s ease-out;
+        }
+
+        .hero:hover .hero-bg {
+            transform: scale(1);
+        }
+
+        .hero-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .hero-text p {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.6;
+        }
+
+        /* -- Gallery -- */
+        .gallery {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .gallery h2 {
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .grid-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease, filter 0.6s ease;
+            filter: grayscale(20%);
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.03);
+            filter: grayscale(0%);
+        }
+
+        .grid-item.tall {
+            grid-row: span 2;
+        }
+
+        /* -- About -- */
+        .about {
+            padding: 8rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .about h2 {
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            margin-bottom: 2rem;
+        }
+
+        .about p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* -- Contact / Footer -- */
+        .contact {
+            padding: 6rem 2rem 3rem;
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0.4;
+            margin-bottom: 2rem;
+        }
+
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .socials a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .socials a:hover {
+            opacity: 1;
+            border-bottom-color: #e0e0e0;
+        }
+
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            opacity: 0.25;
+            letter-spacing: 0.1em;
+        }
+
+        /* -- Lightbox -- */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        /* -- Responsive -- */
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem;
+            }
+
+            nav {
+                gap: 1.5rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-item.tall {
+                grid-row: span 1;
+            }
+
+            .socials {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+
+        /* -- Fade-in animation -- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" class="logo">Aaron Bisla</a>
+    <nav>
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-text">
+        <h1>Aaron Bisla</h1>
+        <p>Photographer &amp; Creative</p>
+    </div>
+</section>
+
+<section class="gallery" id="work">
+    <h2>Selected Work</h2>
+    <div class="grid">
+        <div class="grid-item tall fade-in">
+            <img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait — black and white" loading="lazy">
+        </div>
+        <div class="grid-item fade-in">
+            <img src="images/DSC01513-343f182c-1500.jpg" alt="Portrait — studio" loading="lazy">
+        </div>
+        <div class="grid-item fade-in">
+            <img src="images/00690_22A-27a90197-2500.jpg" alt="Film — warm tones" loading="lazy">
+        </div>
+        <div class="grid-item tall fade-in">
+            <img src="images/DSC01266-054fa899-2500.jpg" alt="Portrait — neon" loading="lazy">
+        </div>
+        <div class="grid-item fade-in">
+            <img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Landscape — open road" loading="lazy">
+        </div>
+        <div class="grid-item fade-in">
+            <img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Film scan — street" loading="lazy">
+        </div>
+        <div class="grid-item fade-in">
+            <img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Film scan — performance" loading="lazy">
+        </div>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <h2>About</h2>
+    <p class="fade-in">Capturing people and places on film and digital. Based in the moments between the planned ones.</p>
+</section>
+
+<section class="contact" id="contact">
+    <h2>Connect</h2>
+    <div class="socials fade-in">
+        <a href="https://instagram.com/bislaaa" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://twitter.com/44ron44" target="_blank" rel="noopener">Twitter</a>
+    </div>
+</section>
+
+<footer>
+    &copy; 2026 Aaron Bisla
+</footer>
+
+<div class="lightbox" id="lightbox">
+    <img src="" alt="Full size">
+</div>
+
+<script>
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('img');
+
+    document.querySelectorAll('.grid-item img').forEach(img => {
+        img.addEventListener('click', () => {
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+            lightbox.classList.add('active');
+        });
+    });
+
+    lightbox.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') lightbox.classList.remove('active');
+    });
+
+    // Scroll fade-in
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('nav a').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(a.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+</script>
+
+</body>
+</html>
