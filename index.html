@@ -523,24 +523,210 @@
             letter-spacing: 0.25em;
         }
 
-        /* ── Lightbox ── */
-        .lightbox {
+        /* ── Viewer Modal ── */
+        .viewer {
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 200;
-            background: rgba(0,0,0,0.97);
+            z-index: 9000;
+            background: rgba(2,2,2,0.97);
             align-items: center;
             justify-content: center;
             cursor: zoom-out;
+            animation: viewer-in 0.3s ease;
         }
-        .lightbox.active { display: flex; }
-        .lightbox img {
-            max-width: 92vw;
-            max-height: 92vh;
+        .viewer.active { display: flex; }
+
+        @keyframes viewer-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .viewer-frame {
+            position: relative;
+            max-width: 90vw;
+            max-height: 88vh;
+        }
+
+        .viewer-frame img {
+            max-width: 90vw;
+            max-height: 88vh;
             object-fit: contain;
-            border: 1px solid rgba(0,240,255,0.08);
+            display: block;
+            border: 1px solid rgba(0,240,255,0.12);
+            animation: viewer-img-in 0.4s cubic-bezier(0.16,1,0.3,1);
         }
+
+        @keyframes viewer-img-in {
+            from { transform: scale(0.92); opacity: 0; filter: brightness(2) contrast(0.5); }
+            to { transform: scale(1); opacity: 1; filter: brightness(1) contrast(1); }
+        }
+
+        /* Corner brackets on image */
+        .viewer-bracket {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+        }
+        .viewer-bracket::before, .viewer-bracket::after {
+            content: '';
+            position: absolute;
+            background: var(--cyan);
+            opacity: 0.5;
+        }
+        .vb-tl { top: -1px; left: -1px; }
+        .vb-tl::before { top: 0; left: 0; width: 24px; height: 1px; }
+        .vb-tl::after { top: 0; left: 0; width: 1px; height: 24px; }
+        .vb-tr { top: -1px; right: -1px; }
+        .vb-tr::before { top: 0; right: 0; width: 24px; height: 1px; }
+        .vb-tr::after { top: 0; right: 0; width: 1px; height: 24px; }
+        .vb-bl { bottom: -1px; left: -1px; }
+        .vb-bl::before { bottom: 0; left: 0; width: 24px; height: 1px; }
+        .vb-bl::after { bottom: 0; left: 0; width: 1px; height: 24px; }
+        .vb-br { bottom: -1px; right: -1px; }
+        .vb-br::before { bottom: 0; right: 0; width: 24px; height: 1px; }
+        .vb-br::after { bottom: 0; right: 0; width: 1px; height: 24px; }
+
+        /* HUD data around the image */
+        .viewer-hud-top {
+            position: absolute;
+            top: -22px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.15em;
+            color: var(--cyan);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .viewer-hud-bottom {
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.15em;
+            color: var(--cyan);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .viewer-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 20%, var(--cyan) 50%, transparent 80%);
+            opacity: 0;
+            pointer-events: none;
+            animation: viewer-scan 3s linear infinite;
+        }
+
+        @keyframes viewer-scan {
+            0% { top: 0; opacity: 0; }
+            5% { opacity: 0.15; }
+            95% { opacity: 0.15; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Close button */
+        .viewer-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--text);
+            opacity: 0.3;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            z-index: 10;
+        }
+        .viewer-close:hover {
+            opacity: 1;
+            color: var(--magenta);
+            text-shadow: 0 0 10px rgba(255,0,170,0.5);
+        }
+
+        /* Chromatic aberration on hover inside viewer */
+        .viewer-frame:hover img {
+            filter: drop-shadow(-2px 0 rgba(0,240,255,0.2)) drop-shadow(2px 0 rgba(255,0,170,0.2));
+        }
+
+        /* ── Gallery item hover effects ── */
+        .item .hover-data {
+            position: absolute;
+            bottom: 8px;
+            left: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.45rem;
+            letter-spacing: 0.15em;
+            color: var(--cyan);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 3;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        .item:hover .hover-data { opacity: 0.5; }
+
+        .item .hover-bracket {
+            position: absolute;
+            inset: 6px;
+            border: 1px solid var(--cyan);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .item:hover .hover-bracket { opacity: 0.12; }
+
+        .item .hover-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 3;
+            pointer-events: none;
+        }
+        .item .hover-crosshair::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--cyan);
+        }
+        .item .hover-crosshair::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--cyan);
+        }
+
+        .item:hover .hover-crosshair { opacity: 0.2; }
 
         /* ── Scroll animations ── */
         .reveal {
@@ -694,45 +880,127 @@
 
 <div class="glitch-band" id="glitch-band"></div>
 
-<div class="lightbox" id="lightbox"><img src="" alt="Full size"></div>
+<!-- ── Viewer Modal ── -->
+<div class="viewer" id="viewer">
+    <div class="viewer-close" id="viewer-close">[esc] close</div>
+    <div class="viewer-frame" id="viewer-frame">
+        <img src="" alt="Full size" id="viewer-img">
+        <div class="viewer-bracket vb-tl"></div>
+        <div class="viewer-bracket vb-tr"></div>
+        <div class="viewer-bracket vb-bl"></div>
+        <div class="viewer-bracket vb-br"></div>
+        <div class="viewer-hud-top">
+            <span id="viewer-label">FILE::UNKNOWN</span>
+            <span id="viewer-res">--x--</span>
+        </div>
+        <div class="viewer-hud-bottom">
+            <span id="viewer-idx">01/07</span>
+            <span>RENDER::ACTIVE</span>
+        </div>
+        <div class="viewer-scanline"></div>
+    </div>
+</div>
 
 <script>
 (function() {
-    // Lightbox
-    const lb = document.getElementById('lightbox');
-    const lbi = lb.querySelector('img');
-    document.querySelectorAll('.item img, .hero-cell img').forEach(img => {
-        img.addEventListener('click', () => {
-            lbi.src = img.src;
-            lbi.alt = img.alt;
-            lb.classList.add('active');
-        });
-    });
-    lb.addEventListener('click', () => lb.classList.remove('active'));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('active'); });
+    // ── Inject hover overlays into every gallery item ──
+    document.querySelectorAll('.item').forEach((item, i) => {
+        const fname = (item.querySelector('img')?.alt || 'FRAME_' + i).toUpperCase().replace(/\s+/g, '_');
 
-    // Scroll reveal
+        const bracket = document.createElement('div');
+        bracket.className = 'hover-bracket';
+        item.appendChild(bracket);
+
+        const crosshair = document.createElement('div');
+        crosshair.className = 'hover-crosshair';
+        item.appendChild(crosshair);
+
+        const data = document.createElement('div');
+        data.className = 'hover-data';
+        data.textContent = fname.slice(0, 20) + ' // F' + (i + 1).toString().padStart(2, '0');
+        item.appendChild(data);
+    });
+
+    // ── Viewer modal ──
+    const viewer = document.getElementById('viewer');
+    const vImg = document.getElementById('viewer-img');
+    const vLabel = document.getElementById('viewer-label');
+    const vRes = document.getElementById('viewer-res');
+    const vIdx = document.getElementById('viewer-idx');
+    const vClose = document.getElementById('viewer-close');
+
+    const allImages = Array.from(document.querySelectorAll('.item img, .hero-cell img'));
+    let currentIdx = 0;
+
+    function openViewer(img) {
+        currentIdx = allImages.indexOf(img);
+        vImg.src = img.src;
+        vImg.alt = img.alt;
+        vLabel.textContent = 'FILE::' + (img.alt || 'UNKNOWN').toUpperCase().replace(/\s+/g, '_').slice(0, 30);
+        vIdx.textContent = (currentIdx + 1).toString().padStart(2, '0') + '/' + allImages.length.toString().padStart(2, '0');
+
+        // Get natural dimensions once loaded
+        const tmpImg = new Image();
+        tmpImg.onload = () => { vRes.textContent = tmpImg.naturalWidth + 'x' + tmpImg.naturalHeight; };
+        tmpImg.src = img.src;
+
+        viewer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeViewer() {
+        viewer.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function navViewer(dir) {
+        currentIdx = (currentIdx + dir + allImages.length) % allImages.length;
+        const img = allImages[currentIdx];
+        vImg.src = img.src;
+        vImg.alt = img.alt;
+        vLabel.textContent = 'FILE::' + (img.alt || 'UNKNOWN').toUpperCase().replace(/\s+/g, '_').slice(0, 30);
+        vIdx.textContent = (currentIdx + 1).toString().padStart(2, '0') + '/' + allImages.length.toString().padStart(2, '0');
+        const tmpImg = new Image();
+        tmpImg.onload = () => { vRes.textContent = tmpImg.naturalWidth + 'x' + tmpImg.naturalHeight; };
+        tmpImg.src = img.src;
+    }
+
+    allImages.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => openViewer(img));
+    });
+
+    viewer.addEventListener('click', e => {
+        if (e.target === viewer) closeViewer();
+    });
+    vClose.addEventListener('click', closeViewer);
+
+    document.addEventListener('keydown', e => {
+        if (!viewer.classList.contains('active')) return;
+        if (e.key === 'Escape') closeViewer();
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navViewer(1);
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navViewer(-1);
+    });
+
+    // ── Scroll reveal ──
     const io = new IntersectionObserver(entries => {
         entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
     }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
-
     document.querySelectorAll('.reveal, .reveal-l, .reveal-r').forEach(el => io.observe(el));
 
-    // Stagger gallery items on scroll
+    // ── Stagger gallery items ──
     const staggerObs = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (!entry.isIntersecting) return;
-            const items = entry.target.querySelectorAll('.item');
-            items.forEach((item, i) => {
+            entry.target.querySelectorAll('.item').forEach((item, i) => {
                 setTimeout(() => item.classList.add('vis'), i * 120);
             });
             staggerObs.unobserve(entry.target);
         });
     }, { threshold: 0.1 });
-
     document.querySelectorAll('.stagger').forEach(g => staggerObs.observe(g));
 
-    // Parallax on gallery images
+    // ── Parallax ──
     function raf() {
         document.querySelectorAll('.mono-grid .item img, .color-grid .item img').forEach(img => {
             const r = img.getBoundingClientRect();
@@ -743,7 +1011,7 @@
     }
     requestAnimationFrame(raf);
 
-    // Smooth nav scroll
+    // ── Smooth nav ──
     document.querySelectorAll('nav a').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
@@ -752,34 +1020,28 @@
         });
     });
 
-    // Randomize hero zoom origins
+    // ── Hero zoom origins ──
     document.querySelectorAll('.hero-cell img').forEach(img => {
         img.style.transformOrigin = `${30 + Math.random() * 40}% ${30 + Math.random() * 40}%`;
     });
 
-    // HUD clock
+    // ── HUD clock ──
     const hudClock = document.getElementById('hud-clock');
     if (hudClock) {
-        setInterval(() => {
-            const d = new Date();
-            hudClock.textContent = d.toTimeString().slice(0, 8);
-        }, 1000);
+        setInterval(() => { hudClock.textContent = new Date().toTimeString().slice(0, 8); }, 1000);
     }
 
-    // Random glitch band
+    // ── Glitch band ──
     const band = document.getElementById('glitch-band');
     if (band) {
-        function fireGlitch() {
-            const y = Math.random() * window.innerHeight;
-            const w = 1 + Math.random() * 3;
-            band.style.top = y + 'px';
-            band.style.height = w + 'px';
+        (function fireGlitch() {
+            band.style.top = (Math.random() * window.innerHeight) + 'px';
+            band.style.height = (1 + Math.random() * 3) + 'px';
             band.style.opacity = 0.15 + Math.random() * 0.2;
             band.style.background = Math.random() > 0.5 ? 'var(--cyan)' : 'var(--magenta)';
             setTimeout(() => { band.style.opacity = 0; }, 50 + Math.random() * 100);
             setTimeout(fireGlitch, 3000 + Math.random() * 8000);
-        }
-        setTimeout(fireGlitch, 2000);
+        })();
     }
 })();
 </script>
