@@ -1,1061 +1,1034 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aaron Bisla</title>
-    <meta name="description" content="Aaron Bisla — photographer and creative. Film, digital, and everything in between.">
-    <meta property="og:title" content="Aaron Bisla">
-    <meta property="og:description" content="Photographer and creative. Film, digital, and everything in between.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://aaronbisla.com">
-    <link rel="canonical" href="https://aaronbisla.com">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap');
-
-        :root {
-            --cyan: #00f0ff;
-            --magenta: #ff00aa;
-            --bg: #050505;
-            --text: #d0d0d0;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; scroll-padding-top: 60px; }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-weight: 300;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ── Scanlines ── */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 9998;
-            pointer-events: none;
-            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.06) 1px, rgba(0,0,0,0.06) 3px);
-            animation: scanline-drift 0.1s steps(2) infinite;
-        }
-
-        @keyframes scanline-drift {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(3px); }
-        }
-
-        /* ── Screen flicker ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 9997;
-            pointer-events: none;
-            background: transparent;
-            animation: screen-flicker 8s infinite;
-        }
-
-        @keyframes screen-flicker {
-            0%,97%,100% { opacity: 0; }
-            97.5% { opacity: 1; background: rgba(0,240,255,0.015); }
-            98% { opacity: 0; }
-            98.5% { opacity: 1; background: rgba(255,0,170,0.01); }
-            99% { opacity: 0; }
-        }
-
-        /* ── HUD overlay ── */
-        .hud {
-            position: fixed;
-            inset: 0;
-            z-index: 9990;
-            pointer-events: none;
-            font-family: 'Space Mono', monospace;
-            color: var(--cyan);
-        }
-
-        .hud-corner {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            opacity: 0.15;
-        }
-        .hud-corner::before, .hud-corner::after {
-            content: '';
-            position: absolute;
-            background: var(--cyan);
-        }
-        .hud-tl { top: 12px; left: 12px; }
-        .hud-tl::before { top: 0; left: 0; width: 20px; height: 1px; }
-        .hud-tl::after { top: 0; left: 0; width: 1px; height: 20px; }
-        .hud-tr { top: 12px; right: 12px; }
-        .hud-tr::before { top: 0; right: 0; width: 20px; height: 1px; }
-        .hud-tr::after { top: 0; right: 0; width: 1px; height: 20px; }
-        .hud-bl { bottom: 12px; left: 12px; }
-        .hud-bl::before { bottom: 0; left: 0; width: 20px; height: 1px; }
-        .hud-bl::after { bottom: 0; left: 0; width: 1px; height: 20px; }
-        .hud-br { bottom: 12px; right: 12px; }
-        .hud-br::before { bottom: 0; right: 0; width: 20px; height: 1px; }
-        .hud-br::after { bottom: 0; right: 0; width: 1px; height: 20px; }
-
-        .hud-data {
-            position: absolute;
-            bottom: 16px;
-            left: 50px;
-            font-size: 0.5rem;
-            letter-spacing: 0.2em;
-            opacity: 0.1;
-            animation: hud-blink 4s infinite;
-        }
-
-        .hud-ts {
-            position: absolute;
-            top: 16px;
-            right: 50px;
-            font-size: 0.5rem;
-            letter-spacing: 0.15em;
-            opacity: 0.1;
-            animation: hud-blink 5s infinite;
-        }
-
-        .hud-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), transparent);
-            opacity: 0.06;
-        }
-
-        .hud-vline {
-            position: absolute;
-            top: 60px;
-            right: 40px;
-            width: 1px;
-            height: 80px;
-            background: linear-gradient(to bottom, var(--cyan), transparent);
-            opacity: 0.06;
-        }
-
-        @keyframes hud-blink {
-            0%,45%,55%,100% { opacity: 0.1; }
-            50% { opacity: 0.25; }
-        }
-
-        /* ── Glitch band — random horizontal distortion ── */
-        .glitch-band {
-            position: fixed;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--cyan);
-            opacity: 0;
-            z-index: 9996;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        /* ── Header ── */
-        header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-            padding: 1.2rem 2.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(12px) saturate(1.4);
-            background: rgba(5,5,5,0.5);
-            border-bottom: 1px solid rgba(0,240,255,0.06);
-        }
-
-        .logo {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: var(--cyan);
-            text-decoration: none;
-            text-shadow: 0 0 25px rgba(0,240,255,0.4);
-        }
-
-        nav { display: flex; gap: 2rem; }
-        nav a {
-            color: var(--text);
-            text-decoration: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            opacity: 0.4;
-            transition: all 0.3s;
-        }
-        nav a:hover { opacity: 1; color: var(--cyan); text-shadow: 0 0 12px rgba(0,240,255,0.5); }
-
-        /* ── Hero Collage ── */
-        .hero {
-            height: 100vh;
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 2px;
-            position: relative;
-        }
-
-        .hero-cell {
-            overflow: hidden;
-            position: relative;
-        }
-
-        .hero-cell img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            filter: contrast(1.35) brightness(0.55);
-            transform: scale(1.1);
-            transition: transform 15s ease-out, filter 1.5s ease;
-        }
-
-        .hero:hover .hero-cell img {
-            transform: scale(1.02);
-        }
-
-        .hero-cell:nth-child(1) { grid-row: 1 / -1; }
-
-        /* Neon edge glow between cells */
-        .hero-cell::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
-            pointer-events: none;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .hero-overlay h1 {
-            font-family: 'Space Mono', monospace;
-            font-size: clamp(1.8rem, 6vw, 5rem);
-            font-weight: 700;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: #fff;
-            position: relative;
-            animation: glitch-text 6s infinite;
-            text-indent: 0.3em;
-        }
-
-        .hero-overlay h1::before,
-        .hero-overlay h1::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            overflow: hidden;
-        }
-        .hero-overlay h1::before {
-            color: var(--cyan);
-            z-index: -1;
-            animation: glitch-1 4s infinite linear alternate-reverse;
-        }
-        .hero-overlay h1::after {
-            color: var(--magenta);
-            z-index: -2;
-            animation: glitch-2 3s infinite linear alternate-reverse;
-        }
-
-        .tagline {
-            font-family: 'Space Mono', monospace;
-            font-size: clamp(0.55rem, 1vw, 0.75rem);
-            letter-spacing: 0.6em;
-            text-transform: uppercase;
-            opacity: 0.4;
-            margin-top: 0.8rem;
-            text-indent: 0.6em;
-        }
-
-        .scroll-cue {
-            position: absolute;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(to bottom, var(--cyan), transparent);
-            opacity: 0.3;
-            animation: scroll-pulse 2.5s infinite;
-        }
-
-        @keyframes scroll-pulse {
-            0%,100% { opacity: 0.2; height: 40px; }
-            50% { opacity: 0.6; height: 55px; }
-        }
-
-        @keyframes glitch-1 {
-            0%,94% { clip-path: inset(0); transform: translate(0); }
-            95% { clip-path: inset(15% 0 65% 0); transform: translate(-3px); }
-            96% { clip-path: inset(55% 0 15% 0); transform: translate(4px); }
-            97% { clip-path: inset(75% 0 5% 0); transform: translate(-2px); }
-            98% { clip-path: inset(0); transform: translate(0); }
-        }
-
-        @keyframes glitch-2 {
-            0%,92% { clip-path: inset(0); transform: translate(0); }
-            93% { clip-path: inset(35% 0 40% 0); transform: translate(5px); }
-            94% { clip-path: inset(10% 0 75% 0); transform: translate(-3px); }
-            95% { clip-path: inset(0); transform: translate(0); }
-        }
-
-        @keyframes glitch-text {
-            0%,88% { text-shadow: none; }
-            89% { text-shadow: -4px 0 var(--cyan), 4px 0 var(--magenta); }
-            90% { text-shadow: 3px 0 var(--cyan), -3px 0 var(--magenta); }
-            91% { text-shadow: none; }
-            95% { text-shadow: -2px 0 var(--magenta), 2px 0 var(--cyan); }
-            96% { text-shadow: none; }
-        }
-
-        /* ── Shared gallery styles ── */
-        .section-head {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.6rem;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
-            opacity: 0.2;
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .section-head::before { content: '[ '; color: var(--cyan); opacity: 0.5; }
-        .section-head::after { content: ' ]'; color: var(--cyan); opacity: 0.5; }
-
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent 5%, var(--cyan) 50%, transparent 95%);
-            opacity: 0.08;
-            margin: 0 auto;
-            max-width: 90%;
-        }
-
-        /* ── Mono Section ── */
-        .mono {
-            padding: 5rem 1rem;
-        }
-
-        .mono-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: 180px;
-            gap: 3px;
-            max-width: 1500px;
-            margin: 0 auto;
-        }
-
-        .mono-grid .item {
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .mono-grid .item img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            filter: grayscale(100%) contrast(1.5) brightness(0.85);
-            transition: filter 0.7s ease, transform 0.7s ease;
-        }
-
-        .mono-grid .item:hover img {
-            transform: scale(1.06);
-            filter: grayscale(100%) contrast(1.6) brightness(1);
-        }
-
-        /* Accent items reveal color on hover */
-        .mono-grid .item.accent:hover img {
-            filter: grayscale(0%) contrast(1.2) saturate(1.6) brightness(1.05);
-        }
-
-        .mono-grid .item.accent::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 2px;
-            background: var(--magenta);
-            opacity: 0;
-            transition: opacity 0.4s, box-shadow 0.4s;
-            z-index: 2;
-        }
-        .mono-grid .item.accent:hover::after {
-            opacity: 1;
-            box-shadow: 0 0 20px var(--magenta), 0 -5px 30px rgba(255,0,170,0.15);
-        }
-
-        /* Grid placement — fixed layout, no gaps */
-        .m1 { grid-column: 1 / 5; grid-row: 1 / 4; }
-        .m2 { grid-column: 5 / 9; grid-row: 1 / 3; }
-        .m3 { grid-column: 9 / 13; grid-row: 1 / 2; }
-        .m4 { grid-column: 9 / 13; grid-row: 2 / 4; }
-        .m5 { grid-column: 5 / 8; grid-row: 3 / 5; }
-        .m6 { grid-column: 1 / 5; grid-row: 4 / 6; }
-        .m7 { grid-column: 8 / 13; grid-row: 4 / 6; }
-
-        /* ── Color Section ── */
-        .chromatic {
-            padding: 5rem 1rem;
-        }
-
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-auto-rows: 180px;
-            gap: 3px;
-            max-width: 1500px;
-            margin: 0 auto;
-        }
-
-        .color-grid .item {
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .color-grid .item img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            filter: contrast(1.25) saturate(1.4) brightness(0.95);
-            transition: transform 0.7s ease, filter 0.5s ease;
-        }
-
-        .color-grid .item:hover img {
-            transform: scale(1.05);
-            filter: contrast(1.35) saturate(1.6) brightness(1.05);
-        }
-
-        .color-grid .item::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            border: 1px solid transparent;
-            transition: all 0.4s;
-            pointer-events: none;
-        }
-        .color-grid .item:hover::before {
-            border-color: var(--cyan);
-            box-shadow: inset 0 0 40px rgba(0,240,255,0.08);
-        }
-
-        .c1 { grid-column: 1 / 6; grid-row: 1 / 4; }
-        .c2 { grid-column: 6 / 9; grid-row: 1 / 3; }
-        .c3 { grid-column: 9 / 13; grid-row: 1 / 2; }
-        .c4 { grid-column: 9 / 13; grid-row: 2 / 4; }
-        .c5 { grid-column: 6 / 9; grid-row: 3 / 5; }
-        .c6 { grid-column: 1 / 4; grid-row: 4 / 6; }
-        .c7 { grid-column: 4 / 9; grid-row: 5 / 7; }
-        .c8 { grid-column: 9 / 13; grid-row: 4 / 7; }
-        .c9 { grid-column: 1 / 4; grid-row: 6 / 7; }
-
-        /* ── About ── */
-        .about {
-            padding: 7rem 2rem;
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .about p {
-            font-size: 1.1rem;
-            line-height: 2;
-            opacity: 0.6;
-        }
-
-        .about p em {
-            font-style: normal;
-            color: var(--cyan);
-            opacity: 1;
-        }
-
-        /* ── Contact ── */
-        .contact { padding: 5rem 2rem 2rem; text-align: center; }
-
-        .socials { display: flex; justify-content: center; gap: 3rem; margin-bottom: 3rem; }
-
-        .socials a {
-            color: var(--text);
-            text-decoration: none;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            opacity: 0.3;
-            transition: all 0.3s;
-            padding-bottom: 3px;
-            border-bottom: 1px solid transparent;
-        }
-        .socials a:hover {
-            opacity: 1;
-            color: var(--cyan);
-            border-bottom-color: var(--cyan);
-            text-shadow: 0 0 15px rgba(0,240,255,0.4);
-        }
-
-        footer {
-            padding: 2rem;
-            text-align: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.55rem;
-            opacity: 0.12;
-            letter-spacing: 0.25em;
-        }
-
-        /* ── Viewer Modal ── */
-        .viewer {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9000;
-            background: rgba(2,2,2,0.97);
-            align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
-            animation: viewer-in 0.3s ease;
-        }
-        .viewer.active { display: flex; }
-
-        @keyframes viewer-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .viewer-frame {
-            position: relative;
-            max-width: 90vw;
-            max-height: 88vh;
-        }
-
-        .viewer-frame img {
-            max-width: 90vw;
-            max-height: 88vh;
-            object-fit: contain;
-            display: block;
-            border: 1px solid rgba(0,240,255,0.12);
-            animation: viewer-img-in 0.4s cubic-bezier(0.16,1,0.3,1);
-        }
-
-        @keyframes viewer-img-in {
-            from { transform: scale(0.92); opacity: 0; filter: brightness(2) contrast(0.5); }
-            to { transform: scale(1); opacity: 1; filter: brightness(1) contrast(1); }
-        }
-
-        /* Corner brackets on image */
-        .viewer-bracket {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            pointer-events: none;
-        }
-        .viewer-bracket::before, .viewer-bracket::after {
-            content: '';
-            position: absolute;
-            background: var(--cyan);
-            opacity: 0.5;
-        }
-        .vb-tl { top: -1px; left: -1px; }
-        .vb-tl::before { top: 0; left: 0; width: 24px; height: 1px; }
-        .vb-tl::after { top: 0; left: 0; width: 1px; height: 24px; }
-        .vb-tr { top: -1px; right: -1px; }
-        .vb-tr::before { top: 0; right: 0; width: 24px; height: 1px; }
-        .vb-tr::after { top: 0; right: 0; width: 1px; height: 24px; }
-        .vb-bl { bottom: -1px; left: -1px; }
-        .vb-bl::before { bottom: 0; left: 0; width: 24px; height: 1px; }
-        .vb-bl::after { bottom: 0; left: 0; width: 1px; height: 24px; }
-        .vb-br { bottom: -1px; right: -1px; }
-        .vb-br::before { bottom: 0; right: 0; width: 24px; height: 1px; }
-        .vb-br::after { bottom: 0; right: 0; width: 1px; height: 24px; }
-
-        /* HUD data around the image */
-        .viewer-hud-top {
-            position: absolute;
-            top: -22px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.5rem;
-            letter-spacing: 0.15em;
-            color: var(--cyan);
-            opacity: 0.35;
-            pointer-events: none;
-        }
-
-        .viewer-hud-bottom {
-            position: absolute;
-            bottom: -22px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.5rem;
-            letter-spacing: 0.15em;
-            color: var(--cyan);
-            opacity: 0.35;
-            pointer-events: none;
-        }
-
-        .viewer-scanline {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent 20%, var(--cyan) 50%, transparent 80%);
-            opacity: 0;
-            pointer-events: none;
-            animation: viewer-scan 3s linear infinite;
-        }
-
-        @keyframes viewer-scan {
-            0% { top: 0; opacity: 0; }
-            5% { opacity: 0.15; }
-            95% { opacity: 0.15; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        /* Close button */
-        .viewer-close {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.2em;
-            color: var(--text);
-            opacity: 0.3;
-            cursor: pointer;
-            pointer-events: all;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            z-index: 10;
-        }
-        .viewer-close:hover {
-            opacity: 1;
-            color: var(--magenta);
-            text-shadow: 0 0 10px rgba(255,0,170,0.5);
-        }
-
-        /* Chromatic aberration on hover inside viewer */
-        .viewer-frame:hover img {
-            filter: drop-shadow(-2px 0 rgba(0,240,255,0.2)) drop-shadow(2px 0 rgba(255,0,170,0.2));
-        }
-
-        /* ── Gallery item hover effects ── */
-        .item .hover-data {
-            position: absolute;
-            bottom: 8px;
-            left: 10px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.45rem;
-            letter-spacing: 0.15em;
-            color: var(--cyan);
-            opacity: 0;
-            transition: opacity 0.4s;
-            z-index: 3;
-            pointer-events: none;
-            text-transform: uppercase;
-        }
-
-        .item:hover .hover-data { opacity: 0.5; }
-
-        .item .hover-bracket {
-            position: absolute;
-            inset: 6px;
-            border: 1px solid var(--cyan);
-            opacity: 0;
-            transition: opacity 0.4s;
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        .item:hover .hover-bracket { opacity: 0.12; }
-
-        .item .hover-crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 3;
-            pointer-events: none;
-        }
-        .item .hover-crosshair::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--cyan);
-        }
-        .item .hover-crosshair::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: var(--cyan);
-        }
-
-        .item:hover .hover-crosshair { opacity: 0.2; }
-
-        /* ── Scroll animations ── */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1);
-        }
-        .reveal.vis { opacity: 1; transform: translateY(0); }
-
-        .reveal-l { opacity: 0; transform: translateX(-50px); transition: opacity 1s ease, transform 1s ease; }
-        .reveal-r { opacity: 0; transform: translateX(50px); transition: opacity 1s ease, transform 1s ease; }
-        .reveal-l.vis, .reveal-r.vis { opacity: 1; transform: translateX(0); }
-
-        /* stagger children */
-        .stagger > .item { opacity: 0; transform: translateY(30px) scale(0.97); transition: opacity 0.8s ease, transform 0.8s ease; }
-        .stagger > .item.vis { opacity: 1; transform: translateY(0) scale(1); }
-
-        /* ── Responsive ── */
-        @media (max-width: 1024px) {
-            .mono-grid, .color-grid {
-                grid-template-columns: repeat(6, 1fr);
-                grid-auto-rows: 150px;
-            }
-            .m1 { grid-column: 1 / 4; grid-row: 1 / 3; }
-            .m2 { grid-column: 4 / 7; grid-row: 1 / 3; }
-            .m3 { grid-column: 1 / 3; grid-row: 3 / 4; }
-            .m4 { grid-column: 3 / 7; grid-row: 3 / 5; }
-            .m5 { grid-column: 1 / 3; grid-row: 4 / 6; }
-            .m6 { grid-column: 3 / 5; grid-row: 5 / 7; }
-            .m7 { grid-column: 5 / 7; grid-row: 5 / 7; }
-            .c1 { grid-column: 1 / 4; grid-row: 1 / 3; }
-            .c2 { grid-column: 4 / 7; grid-row: 1 / 2; }
-            .c3 { grid-column: 4 / 7; grid-row: 2 / 3; }
-            .c4 { grid-column: 1 / 3; grid-row: 3 / 5; }
-            .c5 { grid-column: 3 / 7; grid-row: 3 / 4; }
-            .c6 { grid-column: 3 / 5; grid-row: 4 / 5; }
-            .c7 { grid-column: 5 / 7; grid-row: 4 / 6; }
-            .c8 { grid-column: 1 / 3; grid-row: 5 / 7; }
-            .c9 { grid-column: 3 / 5; grid-row: 5 / 7; }
-        }
-
-        @media (max-width: 600px) {
-            header { padding: 1rem; }
-            nav { gap: 1.2rem; }
-            nav a { font-size: 0.55rem; }
-            .hero { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
-            .hero-cell:nth-child(1) { grid-row: 1 / 3; }
-            .hero-cell:nth-child(5) { display: none; }
-            .mono-grid, .color-grid {
-                grid-template-columns: 1fr 1fr;
-                grid-auto-rows: 200px;
-            }
-            .m1,.m2,.m3,.m4,.m5,.m6,.m7,
-            .c1,.c2,.c3,.c4,.c5,.c6,.c7,.c8,.c9 {
-                grid-column: auto; grid-row: auto;
-            }
-            .m1,.c1 { grid-column: 1 / -1; }
-            .socials { flex-direction: column; gap: 1rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aaron Bisla — Silicon Valley Tech Photographer &amp; Documentarian</title>
+<meta name="description" content="Aaron Bisla is a San Francisco-based photographer documenting the builders, founders, and culture of Silicon Valley. Film and digital. Community technographer at ACCELR8.">
+<meta property="og:title" content="Aaron Bisla — The Human Layer of the Tech Stack">
+<meta property="og:description" content="San Francisco photographer documenting the builders shaping what comes next. Tech events, founder portraits, hacker house culture. Film &amp; digital.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aaronbisla.com">
+<meta property="og:image" content="https://aaronbisla.com/images/DSC01266-054fa899-2500.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@44ron44">
+<meta name="keywords" content="San Francisco photographer, Silicon Valley tech events, founder portraits, hacker house photographer, ACCELR8, film photography, technographer">
+<link rel="canonical" href="https://aaronbisla.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   AARON BISLA — THE HUMAN LAYER OF THE TECH STACK
+   Marathon Terminal Aesthetic // Build 2472.184
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --red-deep: #1a0000;
+  --red-primary: #cc1100;
+  --red-hot: #ff2200;
+  --green-phosphor: #00ff41;
+  --green-olive: #8fa800;
+  --amber: #ff8800;
+  --matrix-bg: #001100;
+  --cobalt: #0a1628;
+  --hazard-yellow: #d4e600;
+  --text-data: #ff3355;
+  --bg: #050810;
+  --text: #c8c8c8;
+  --accent: var(--red-primary);
+  --accent2: var(--amber);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 60px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scanlines ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.06) 1px, rgba(0,0,0,0.06) 3px);
+  animation: scanline-drift 0.1s steps(2) infinite;
+}
+@keyframes scanline-drift { to { transform: translateY(3px); } }
+
+/* ── Screen flicker ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background: transparent;
+  animation: screen-flicker 10s infinite;
+}
+@keyframes screen-flicker {
+  0%,96%,100% { opacity: 0; }
+  97% { opacity: 1; background: rgba(204,17,0,0.012); }
+  98% { opacity: 0; }
+  98.5% { opacity: 1; background: rgba(255,136,0,0.008); }
+  99% { opacity: 0; }
+}
+
+/* ── HUD overlay ── */
+.hud {
+  position: fixed; inset: 0;
+  z-index: 9990; pointer-events: none;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--accent);
+}
+.hud-corner {
+  position: absolute;
+  width: 36px; height: 36px;
+  opacity: 0.12;
+}
+.hud-corner::before, .hud-corner::after {
+  content: ''; position: absolute;
+  background: var(--accent);
+}
+.hud-tl { top: 10px; left: 10px; animation: hud-pulse 3s ease-in-out infinite; }
+.hud-tl::before { top: 0; left: 0; width: 24px; height: 1px; }
+.hud-tl::after  { top: 0; left: 0; width: 1px; height: 24px; }
+.hud-tr { top: 10px; right: 10px; animation: hud-pulse 3s ease-in-out infinite 0.75s; }
+.hud-tr::before { top: 0; right: 0; width: 24px; height: 1px; }
+.hud-tr::after  { top: 0; right: 0; width: 1px; height: 24px; }
+.hud-bl { bottom: 10px; left: 10px; animation: hud-pulse 3s ease-in-out infinite 1.5s; }
+.hud-bl::before { bottom: 0; left: 0; width: 24px; height: 1px; }
+.hud-bl::after  { bottom: 0; left: 0; width: 1px; height: 24px; }
+.hud-br { bottom: 10px; right: 10px; animation: hud-pulse 3s ease-in-out infinite 2.25s; }
+.hud-br::before { bottom: 0; right: 0; width: 24px; height: 1px; }
+.hud-br::after  { bottom: 0; right: 0; width: 1px; height: 24px; }
+
+@keyframes hud-pulse { 0%,100% { opacity: 0.12; } 50% { opacity: 0.3; } }
+
+.hud-data {
+  position: absolute; bottom: 14px; left: 54px;
+  font-size: 0.45rem; letter-spacing: 0.2em;
+  opacity: 0.08; text-transform: uppercase;
+  animation: hud-blink 5s infinite;
+}
+.hud-ts {
+  position: absolute; top: 14px; right: 54px;
+  font-size: 0.45rem; letter-spacing: 0.15em;
+  opacity: 0.08; animation: hud-blink 4s infinite;
+}
+.hud-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  opacity: 0.05;
+}
+@keyframes hud-blink { 0%,45%,55%,100% { opacity: 0.08; } 50% { opacity: 0.2; } }
+
+/* ── Glitch band ── */
+.glitch-band {
+  position: fixed; left: 0; right: 0;
+  height: 2px; background: var(--accent);
+  opacity: 0; z-index: 9996;
+  pointer-events: none; mix-blend-mode: screen;
+}
+
+/* ── Header ── */
+header {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1rem 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(14px) saturate(1.4);
+  background: rgba(5,8,16,0.6);
+  border-bottom: 1px solid rgba(204,17,0,0.06);
+}
+.logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem; font-weight: 400;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  text-shadow: 0 0 20px rgba(204,17,0,0.35);
+}
+nav { display: flex; gap: 2.2rem; }
+nav a {
+  color: var(--text); text-decoration: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.18em;
+  text-transform: uppercase; opacity: 0.35;
+  transition: all 0.3s;
+}
+nav a:hover {
+  opacity: 1; color: var(--accent);
+  text-shadow: 0 0 12px rgba(204,17,0,0.45);
+}
+
+/* ── Hero ── */
+.hero {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  position: relative;
+}
+.hero-cell { overflow: hidden; position: relative; }
+.hero-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: contrast(1.3) brightness(0.5) saturate(0.7);
+  transform: scale(1.12);
+  transition: transform 18s ease-out, filter 1.5s ease;
+}
+.hero:hover .hero-cell img { transform: scale(1.03); }
+.hero-cell:nth-child(1) { grid-row: 1 / -1; }
+.hero-cell::after {
+  content: ''; position: absolute; inset: 0;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.65);
+  pointer-events: none;
+}
+
+.hero-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.hero-overlay h1 {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(1.6rem, 5vw, 4.5rem);
+  font-weight: 400; letter-spacing: 0.35em;
+  text-transform: uppercase; color: #fff;
+  position: relative;
+  animation: glitch-text 8s infinite;
+  text-indent: 0.35em;
+}
+.hero-overlay h1::before,
+.hero-overlay h1::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0; right: 0;
+  overflow: hidden;
+}
+.hero-overlay h1::before { color: var(--accent); z-index: -1; animation: glitch-1 5s infinite linear alternate-reverse; }
+.hero-overlay h1::after  { color: var(--accent2); z-index: -2; animation: glitch-2 4s infinite linear alternate-reverse; }
+
+.tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.5rem, 0.9vw, 0.7rem);
+  letter-spacing: 0.5em; text-transform: uppercase;
+  opacity: 0.35; margin-top: 0.6rem;
+  text-indent: 0.5em; color: var(--accent);
+}
+
+.hero-subtitle {
+  font-family: 'VT323', monospace;
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  letter-spacing: 0.3em; text-transform: uppercase;
+  opacity: 0.15; margin-top: 2rem;
+  color: var(--green-phosphor);
+}
+
+.scroll-cue {
+  position: absolute; bottom: 1.5rem;
+  left: 50%; transform: translateX(-50%);
+  z-index: 20;
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  opacity: 0.25; animation: scroll-pulse 2.5s infinite;
+}
+@keyframes scroll-pulse {
+  0%,100% { opacity: 0.15; height: 40px; }
+  50% { opacity: 0.5; height: 55px; }
+}
+
+@keyframes glitch-1 {
+  0%,94% { clip-path: inset(0); transform: translate(0); }
+  95% { clip-path: inset(15% 0 65% 0); transform: translate(-3px); }
+  96% { clip-path: inset(55% 0 15% 0); transform: translate(4px); }
+  97% { clip-path: inset(0); transform: translate(0); }
+}
+@keyframes glitch-2 {
+  0%,92% { clip-path: inset(0); transform: translate(0); }
+  93% { clip-path: inset(35% 0 40% 0); transform: translate(5px); }
+  94% { clip-path: inset(0); transform: translate(0); }
+}
+@keyframes glitch-text {
+  0%,88% { text-shadow: none; }
+  89% { text-shadow: -3px 0 var(--accent), 3px 0 var(--accent2); }
+  90% { text-shadow: 2px 0 var(--accent), -2px 0 var(--accent2); }
+  91%,100% { text-shadow: none; }
+}
+
+/* ── Section shared ── */
+.section-head {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem; letter-spacing: 0.5em;
+  text-transform: uppercase; opacity: 0.2;
+  text-align: center; margin-bottom: 0.6rem;
+}
+.section-head::before { content: '[ '; color: var(--accent); opacity: 0.5; }
+.section-head::after  { content: ' ]'; color: var(--accent); opacity: 0.5; }
+
+.section-sub {
+  font-family: 'VT323', monospace;
+  font-size: 0.75rem; letter-spacing: 0.3em;
+  text-transform: uppercase; opacity: 0.1;
+  text-align: center; margin-bottom: 2.5rem;
+  color: var(--green-phosphor);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, var(--accent) 50%, transparent 95%);
+  opacity: 0.06; margin: 0 auto; max-width: 90%;
+}
+
+/* ── Gallery Grid ── */
+.gallery-section { padding: 5rem 1rem; }
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 180px;
+  gap: 3px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.photo-grid .item {
+  overflow: hidden; cursor: pointer; position: relative;
+}
+.photo-grid .item img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: filter 0.7s ease, transform 0.7s ease;
+}
+
+/* Monochrome treatment */
+.grid-mono .item img {
+  filter: grayscale(100%) contrast(1.5) brightness(0.85);
+}
+.grid-mono .item:hover img {
+  transform: scale(1.06);
+  filter: grayscale(100%) contrast(1.6) brightness(1);
+}
+.grid-mono .item.accent:hover img {
+  filter: grayscale(0%) contrast(1.2) saturate(1.6) brightness(1.05);
+}
+.grid-mono .item.accent::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent2); opacity: 0;
+  transition: opacity 0.4s, box-shadow 0.4s;
+  z-index: 2;
+}
+.grid-mono .item.accent:hover::after {
+  opacity: 1;
+  box-shadow: 0 0 20px var(--accent2), 0 -5px 30px rgba(255,136,0,0.15);
+}
+
+/* Chromatic treatment */
+.grid-color .item img {
+  filter: contrast(1.25) saturate(1.3) brightness(0.95);
+}
+.grid-color .item:hover img {
+  transform: scale(1.05);
+  filter: contrast(1.35) saturate(1.6) brightness(1.05);
+}
+.grid-color .item::before {
+  content: ''; position: absolute; inset: 0;
+  z-index: 2; border: 1px solid transparent;
+  transition: all 0.4s; pointer-events: none;
+}
+.grid-color .item:hover::before {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 40px rgba(204,17,0,0.06);
+}
+
+/* Grid placement — fixed layout */
+.g1  { grid-column: 1 / 5;  grid-row: 1 / 4; }
+.g2  { grid-column: 5 / 9;  grid-row: 1 / 3; }
+.g3  { grid-column: 9 / 13; grid-row: 1 / 2; }
+.g4  { grid-column: 9 / 13; grid-row: 2 / 4; }
+.g5  { grid-column: 5 / 8;  grid-row: 3 / 5; }
+.g6  { grid-column: 1 / 5;  grid-row: 4 / 6; }
+.g7  { grid-column: 8 / 13; grid-row: 4 / 6; }
+.g8  { grid-column: 1 / 4;  grid-row: 6 / 8; }
+.g9  { grid-column: 4 / 8;  grid-row: 5 / 7; }
+.g10 { grid-column: 8 / 13; grid-row: 6 / 8; }
+.g11 { grid-column: 4 / 8;  grid-row: 7 / 9; }
+
+.c1  { grid-column: 1 / 6;  grid-row: 1 / 4; }
+.c2  { grid-column: 6 / 9;  grid-row: 1 / 3; }
+.c3  { grid-column: 9 / 13; grid-row: 1 / 2; }
+.c4  { grid-column: 9 / 13; grid-row: 2 / 4; }
+.c5  { grid-column: 6 / 9;  grid-row: 3 / 5; }
+.c6  { grid-column: 1 / 4;  grid-row: 4 / 6; }
+.c7  { grid-column: 4 / 9;  grid-row: 5 / 7; }
+.c8  { grid-column: 9 / 13; grid-row: 4 / 7; }
+.c9  { grid-column: 1 / 4;  grid-row: 6 / 7; }
+
+/* ── Item hover overlays ── */
+.item .hover-data {
+  position: absolute; bottom: 8px; left: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.42rem; letter-spacing: 0.15em;
+  color: var(--accent); opacity: 0;
+  transition: opacity 0.4s; z-index: 3;
+  pointer-events: none; text-transform: uppercase;
+}
+.item:hover .hover-data { opacity: 0.5; }
+
+.item .hover-bracket {
+  position: absolute; inset: 6px;
+  border: 1px solid var(--accent);
+  opacity: 0; transition: opacity 0.4s;
+  z-index: 3; pointer-events: none;
+}
+.item:hover .hover-bracket { opacity: 0.1; }
+
+.item .hover-crosshair {
+  position: absolute; top: 50%; left: 50%;
+  width: 20px; height: 20px;
+  transform: translate(-50%, -50%);
+  opacity: 0; transition: opacity 0.3s;
+  z-index: 3; pointer-events: none;
+}
+.item .hover-crosshair::before {
+  content: ''; position: absolute;
+  top: 50%; left: 0; right: 0; height: 1px;
+  background: var(--accent);
+}
+.item .hover-crosshair::after {
+  content: ''; position: absolute;
+  left: 50%; top: 0; bottom: 0; width: 1px;
+  background: var(--accent);
+}
+.item:hover .hover-crosshair { opacity: 0.18; }
+
+/* ── Social proof strip ── */
+.proof-strip {
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(204,17,0,0.04);
+  border-bottom: 1px solid rgba(204,17,0,0.04);
+}
+.proof-strip p {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem; letter-spacing: 0.4em;
+  text-transform: uppercase; opacity: 0.15;
+  color: var(--green-phosphor);
+}
+
+/* ── About ── */
+.about {
+  padding: 6rem 2rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.about-header {
+  text-align: center; margin-bottom: 3rem;
+}
+.about-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.5rem; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 25px rgba(204,17,0,0.2);
+}
+.about-role {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem; letter-spacing: 0.25em;
+  text-transform: uppercase; opacity: 0.3;
+  color: var(--green-phosphor);
+}
+
+.about p {
+  font-size: 1.05rem; line-height: 2;
+  opacity: 0.6; margin-bottom: 1.5rem;
+}
+.about p:last-of-type { margin-bottom: 0; }
+.about em {
+  font-style: normal;
+  color: var(--accent); opacity: 1;
+}
+.about .accent2 { color: var(--amber); }
+.about .green { color: var(--green-phosphor); }
+
+.about-cta {
+  text-align: center; margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(204,17,0,0.08);
+}
+.about-cta a {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--accent);
+  text-decoration: none;
+  padding: 0.8rem 2.5rem;
+  border: 1px solid rgba(204,17,0,0.3);
+  transition: all 0.3s;
+  pointer-events: all;
+}
+.about-cta a:hover {
+  background: rgba(204,17,0,0.08);
+  border-color: var(--accent);
+  text-shadow: 0 0 12px rgba(204,17,0,0.4);
+  box-shadow: 0 0 30px rgba(204,17,0,0.08);
+}
+
+/* ── Services ── */
+.services {
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+.service-card {
+  padding: 2rem 1.5rem;
+  border: 1px solid rgba(204,17,0,0.08);
+  text-align: center;
+  transition: all 0.4s;
+}
+.service-card:hover {
+  border-color: rgba(204,17,0,0.2);
+  background: rgba(204,17,0,0.02);
+}
+.service-card h3 {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+.service-card p {
+  font-size: 0.85rem; line-height: 1.8;
+  opacity: 0.4;
+}
+.service-card .count {
+  font-family: 'VT323', monospace;
+  font-size: 1.8rem; color: var(--amber);
+  opacity: 0.5; margin-bottom: 0.5rem;
+}
+
+/* ── Contact ── */
+.contact { padding: 5rem 2rem 2rem; text-align: center; }
+
+.contact-email {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; letter-spacing: 0.2em;
+  margin-bottom: 2rem;
+}
+.contact-email a {
+  color: var(--accent); text-decoration: none;
+  border-bottom: 1px solid rgba(204,17,0,0.3);
+  padding-bottom: 2px;
+  transition: all 0.3s;
+}
+.contact-email a:hover {
+  text-shadow: 0 0 12px rgba(204,17,0,0.4);
+  border-bottom-color: var(--accent);
+}
+
+.socials { display: flex; justify-content: center; gap: 3rem; margin-bottom: 3rem; }
+.socials a {
+  color: var(--text); text-decoration: none;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.15em;
+  text-transform: uppercase; opacity: 0.25;
+  transition: all 0.3s;
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+}
+.socials a:hover {
+  opacity: 1; color: var(--accent);
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 12px rgba(204,17,0,0.35);
+}
+
+.contact-note {
+  font-family: 'VT323', monospace;
+  font-size: 0.7rem; letter-spacing: 0.3em;
+  text-transform: uppercase; opacity: 0.1;
+  color: var(--green-phosphor);
+  margin-top: 1.5rem;
+}
+
+footer {
+  padding: 2rem; text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem; opacity: 0.08;
+  letter-spacing: 0.25em; text-transform: uppercase;
+}
+
+/* ── Viewer Modal ── */
+.viewer {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 9000;
+  background: rgba(2,2,6,0.97);
+  align-items: center; justify-content: center;
+  cursor: zoom-out;
+  animation: viewer-in 0.3s ease;
+}
+.viewer.active { display: flex; }
+@keyframes viewer-in { from { opacity: 0; } to { opacity: 1; } }
+
+.viewer-frame {
+  position: relative;
+  max-width: 90vw; max-height: 88vh;
+}
+.viewer-frame img {
+  max-width: 90vw; max-height: 88vh;
+  object-fit: contain; display: block;
+  border: 1px solid rgba(204,17,0,0.1);
+  animation: viewer-img-in 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes viewer-img-in {
+  from { transform: scale(0.92); opacity: 0; filter: brightness(1.8) contrast(0.5); }
+  to   { transform: scale(1);    opacity: 1; filter: brightness(1) contrast(1); }
+}
+
+.viewer-bracket {
+  position: absolute; width: 24px; height: 24px;
+  pointer-events: none;
+}
+.viewer-bracket::before, .viewer-bracket::after {
+  content: ''; position: absolute;
+  background: var(--accent); opacity: 0.4;
+}
+.vb-tl { top: -1px; left: -1px; }
+.vb-tl::before { top: 0; left: 0; width: 24px; height: 1px; }
+.vb-tl::after  { top: 0; left: 0; width: 1px; height: 24px; }
+.vb-tr { top: -1px; right: -1px; }
+.vb-tr::before { top: 0; right: 0; width: 24px; height: 1px; }
+.vb-tr::after  { top: 0; right: 0; width: 1px; height: 24px; }
+.vb-bl { bottom: -1px; left: -1px; }
+.vb-bl::before { bottom: 0; left: 0; width: 24px; height: 1px; }
+.vb-bl::after  { bottom: 0; left: 0; width: 1px; height: 24px; }
+.vb-br { bottom: -1px; right: -1px; }
+.vb-br::before { bottom: 0; right: 0; width: 24px; height: 1px; }
+.vb-br::after  { bottom: 0; right: 0; width: 1px; height: 24px; }
+
+.viewer-hud-top, .viewer-hud-bottom {
+  position: absolute; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.45rem; letter-spacing: 0.15em;
+  color: var(--accent); opacity: 0.3;
+  pointer-events: none; text-transform: uppercase;
+}
+.viewer-hud-top    { top: -20px; }
+.viewer-hud-bottom { bottom: -20px; }
+
+.viewer-scanline {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 20%, var(--accent) 50%, transparent 80%);
+  opacity: 0; pointer-events: none;
+  animation: viewer-scan 3.5s linear infinite;
+}
+@keyframes viewer-scan {
+  0%   { top: 0;    opacity: 0; }
+  5%   { opacity: 0.12; }
+  95%  { opacity: 0.12; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.viewer-close {
+  position: absolute; top: 20px; right: 25px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.2em;
+  color: var(--text); opacity: 0.25;
+  cursor: pointer; pointer-events: all;
+  transition: all 0.3s; text-transform: uppercase; z-index: 10;
+}
+.viewer-close:hover {
+  opacity: 1; color: var(--accent);
+  text-shadow: 0 0 10px rgba(204,17,0,0.4);
+}
+
+.viewer-frame:hover img {
+  filter: drop-shadow(-2px 0 rgba(204,17,0,0.15)) drop-shadow(2px 0 rgba(255,136,0,0.15));
+}
+
+/* ── Scroll animations ── */
+.reveal {
+  opacity: 0; transform: translateY(35px);
+  transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.vis { opacity: 1; transform: translateY(0); }
+
+.stagger > .item {
+  opacity: 0; transform: translateY(30px) scale(0.97);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.stagger > .item.vis { opacity: 1; transform: translateY(0) scale(1); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .photo-grid { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 150px; }
+  .g1 { grid-column: 1/4; grid-row: 1/3; }  .g2 { grid-column: 4/7; grid-row: 1/3; }
+  .g3 { grid-column: 1/3; grid-row: 3/4; }  .g4 { grid-column: 3/7; grid-row: 3/5; }
+  .g5 { grid-column: 1/3; grid-row: 4/6; }  .g6 { grid-column: 3/5; grid-row: 5/7; }
+  .g7 { grid-column: 5/7; grid-row: 5/7; }
+  .g8,.g9,.g10,.g11 { grid-column: auto; grid-row: auto; }
+  .c1 { grid-column: 1/4; grid-row: 1/3; } .c2 { grid-column: 4/7; grid-row: 1/2; }
+  .c3 { grid-column: 4/7; grid-row: 2/3; } .c4 { grid-column: 1/3; grid-row: 3/5; }
+  .c5 { grid-column: 3/7; grid-row: 3/4; } .c6 { grid-column: 3/5; grid-row: 4/5; }
+  .c7 { grid-column: 5/7; grid-row: 4/6; } .c8 { grid-column: 1/3; grid-row: 5/7; }
+  .c9 { grid-column: 3/5; grid-row: 5/7; }
+  .services-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  header { padding: 0.8rem 1rem; }
+  nav { gap: 1.2rem; }
+  nav a { font-size: 0.5rem; }
+  .hero { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+  .hero-cell:nth-child(1) { grid-row: 1/3; }
+  .hero-cell:nth-child(5) { display: none; }
+  .photo-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 200px;
+  }
+  .g1,.g2,.g3,.g4,.g5,.g6,.g7,.g8,.g9,.g10,.g11,
+  .c1,.c2,.c3,.c4,.c5,.c6,.c7,.c8,.c9 {
+    grid-column: auto; grid-row: auto;
+  }
+  .g1,.c1 { grid-column: 1 / -1; }
+  .socials { flex-direction: column; gap: 1rem; }
+  .about { padding: 4rem 1.5rem; }
+  .services-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Aaron Bisla Photography",
+  "alternateName": "e/motion",
+  "description": "San Francisco photographer documenting the builders, founders, and culture of Silicon Valley.",
+  "url": "https://aaronbisla.com",
+  "image": "https://aaronbisla.com/images/DSC01266-054fa899-2500.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "San Francisco",
+    "addressRegion": "CA"
+  },
+  "email": "44r0n.biz@gmail.com",
+  "sameAs": [
+    "https://instagram.com/bislaaaron",
+    "https://twitter.com/44ron44"
+  ]
+}
+</script>
 </head>
 <body>
 
 <header>
-    <a href="#" class="logo">Aaron Bisla</a>
-    <nav>
-        <a href="#mono">Mono</a>
-        <a href="#color">Color</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-    </nav>
+  <a href="#" class="logo">Aaron Bisla</a>
+  <nav>
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
 </header>
 
-<!-- ── Hero Collage ── -->
+<!-- ── Hero ── -->
 <section class="hero">
-    <div class="hero-cell"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait"></div>
-    <div class="hero-cell"><img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait"></div>
-    <div class="hero-cell"><img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance"></div>
-    <div class="hero-cell"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road"></div>
-    <div class="hero-cell"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film camera"></div>
+  <div class="hero-cell"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait at tech event" loading="eager"></div>
+  <div class="hero-cell"><img src="images/DSC08405-1000.jpg" alt="Founder pitching at hacker house" loading="eager"></div>
+  <div class="hero-cell"><img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance on film" loading="eager"></div>
+  <div class="hero-cell"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road portrait" loading="eager"></div>
+  <div class="hero-cell"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film camera candid" loading="eager"></div>
 
-    <div class="hero-overlay">
-        <h1 data-text="Aaron Bisla">Aaron Bisla</h1>
-        <div class="tagline">Photographer &amp; Creative</div>
-    </div>
-    <div class="scroll-cue"></div>
+  <div class="hero-overlay">
+    <h1 data-text="Aaron Bisla">Aaron Bisla</h1>
+    <div class="tagline">the human layer of the tech stack</div>
+    <div class="hero-subtitle">San Francisco // Film + Digital // Technographer</div>
+  </div>
+  <div class="scroll-cue"></div>
 </section>
 
-<!-- ── Monochrome ── -->
-<section class="mono" id="mono">
-    <div class="section-head reveal">Monochrome</div>
-    <div class="mono-grid stagger">
-        <div class="item m1 accent"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait — hover for color" loading="lazy"></div>
-        <div class="item m2"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Landscape" loading="lazy"></div>
-        <div class="item m3"><img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street" loading="lazy"></div>
-        <div class="item m4"><img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait" loading="lazy"></div>
-        <div class="item m5 accent"><img src="images/DSC01513-343f182c-1500.jpg" alt="Studio — hover for color" loading="lazy"></div>
-        <div class="item m6"><img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance" loading="lazy"></div>
-        <div class="item m7 accent"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film — hover for color" loading="lazy"></div>
-    </div>
+<!-- ── Social Proof ── -->
+<div class="proof-strip">
+  <p>Community Technographer at ACCELR8 Hacker House, San Francisco</p>
+</div>
+
+<!-- ── Monochrome Gallery ── -->
+<section class="gallery-section" id="work">
+  <div class="section-head reveal">Monochrome</div>
+  <div class="section-sub reveal">Film Scans + Digital B&amp;W</div>
+  <div class="photo-grid grid-mono stagger">
+    <div class="item g1 accent"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy"></div>
+    <div class="item g2"><img src="images/DSC08405-1000.jpg" alt="Founder pitch" loading="lazy"></div>
+    <div class="item g3"><img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street conversation" loading="lazy"></div>
+    <div class="item g4"><img src="images/DSC08226-1000.jpg" alt="Hacker house whiteboard" loading="lazy"></div>
+    <div class="item g5 accent"><img src="images/DSC01513-343f182c-1500.jpg" alt="Creative duo" loading="lazy"></div>
+    <div class="item g6"><img src="images/Scan153-1000.jpg" alt="Mosh pit energy" loading="lazy"></div>
+    <div class="item g7"><img src="images/DSC08616-1000.jpg" alt="Founder presenting" loading="lazy"></div>
+    <div class="item g8"><img src="images/53841852-1000.jpg" alt="Sleep Shop live" loading="lazy"></div>
+    <div class="item g9 accent"><img src="images/DSC01191-f5e79821-2500.jpg" alt="Low angle portrait" loading="lazy"></div>
+    <div class="item g10"><img src="images/DSC09566-1000.jpg" alt="Rooftop social" loading="lazy"></div>
+    <div class="item g11"><img src="images/DSC09868-1000.jpg" alt="Intimate moment" loading="lazy"></div>
+  </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- ── Chromatic ── -->
-<section class="chromatic" id="color">
-    <div class="section-head reveal">Chromatic</div>
-    <div class="color-grid stagger">
-        <div class="item c1"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy"></div>
-        <div class="item c2"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film warm" loading="lazy"></div>
-        <div class="item c3"><img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance" loading="lazy"></div>
-        <div class="item c4"><img src="images/DSC01513-343f182c-1500.jpg" alt="Studio" loading="lazy"></div>
-        <div class="item c5"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road" loading="lazy"></div>
-        <div class="item c6"><img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street" loading="lazy"></div>
-        <div class="item c7"><img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait" loading="lazy"></div>
-        <div class="item c8"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon close" loading="lazy"></div>
-        <div class="item c9"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film camera" loading="lazy"></div>
-    </div>
+<!-- ── Chromatic Gallery ── -->
+<section class="gallery-section">
+  <div class="section-head reveal">Chromatic</div>
+  <div class="section-sub reveal">Color Film + Digital + Cinestill</div>
+  <div class="photo-grid grid-color stagger">
+    <div class="item c1"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy"></div>
+    <div class="item c2"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film warm tones" loading="lazy"></div>
+    <div class="item c3"><img src="images/C5742T01-1000.jpg" alt="Cinestill founder" loading="lazy"></div>
+    <div class="item c4"><img src="images/000164310014-1000.jpg" alt="Light installation" loading="lazy"></div>
+    <div class="item c5"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road" loading="lazy"></div>
+    <div class="item c6"><img src="images/Scan209-1000.jpg" alt="Film scan" loading="lazy"></div>
+    <div class="item c7"><img src="images/DSC07345-1000.jpg" alt="Documentary" loading="lazy"></div>
+    <div class="item c8"><img src="images/000714720016-1000.jpg" alt="Film portrait" loading="lazy"></div>
+    <div class="item c9"><img src="images/Scan179-1000.jpg" alt="Street film" loading="lazy"></div>
+  </div>
 </section>
 
 <div class="divider"></div>
 
 <!-- ── About ── -->
 <section class="about" id="about">
-    <div class="section-head reveal">About</div>
-    <p class="reveal" style="font-size:1.4rem; margin-bottom:1.5rem; opacity:0.9; font-weight:400;">
-        <em>44RON Studios</em>
-    </p>
-    <p class="reveal" style="margin-bottom:1.5rem;">
-        Aaron Bisla is a photographer and creative director shooting on <em>film</em> and <em>digital</em>.
-        Portraits, events, street, editorial. Based in the moments between the planned ones.
-    </p>
-    <p class="reveal" style="margin-bottom:1.5rem;">
-        Equal parts awesomemaxxing and marketabilitymaxxing. The work speaks but the brand screams.
-        Every frame is intentional. Every shoot is a world.
-    </p>
-    <p class="reveal" style="font-size:0.75rem; opacity:0.3; font-family:'Space Mono',monospace; letter-spacing:0.2em;">
-        BOOKINGS OPEN // DM FOR RATES
-    </p>
+  <div class="section-head reveal">About</div>
+
+  <div class="about-header reveal">
+    <div class="about-name">Aaron Bisla</div>
+    <div class="about-role">Photographer // Technographer // Documentarian</div>
+  </div>
+
+  <p class="reveal">
+    San Jose raised me in the shadow of Silicon Valley &mdash; suburban sprawl, long commutes, and the quiet hum of an industry reshaping the world. I studied <em>political economy</em> to understand how, and earned a <em>J.D. from Santa Clara Law</em> to understand why. Then I left corporate behind to document the people actually doing it.
+  </p>
+
+  <p class="reveal">
+    I'm the resident <span class="accent2">community technographer</span> at <em>ACCELR8</em>, a hacker house in San Francisco. I cover the founders, the builders, the late-night pivots and the launch-day energy. Events, mixers, product drops, portraits &mdash; if you're shipping something that matters, I'm there with the camera.
+  </p>
+
+  <p class="reveal">
+    My kit started with a Canon Rebel XS. Somewhere along the way I was gifted an <span class="accent2">AE-1</span> and fell in love with the unexpected. Now I shoot film and digital, always patient, always with one eye open for the frame that tells the real story.
+  </p>
+
+  <p class="reveal">
+    I'm not just a photographer. I'm a writer, researcher, and the guy who understands your pitch deck, your cap table, and the moment your demo actually works. I make beats. I freestyle. And I bring treats for the doggos.
+  </p>
+
+  <p class="reveal" style="opacity:0.8; font-style:italic; font-size:0.95rem;">
+    If you're building what comes next, let's make sure there's a record of it.
+  </p>
+
+  <div class="about-cta reveal">
+    <a href="mailto:44r0n.biz@gmail.com">Book a Session</a>
+  </div>
 </section>
+
+<div class="divider"></div>
+
+<!-- ── Services ── -->
+<section class="services reveal">
+  <div class="section-head">Packages</div>
+  <div class="section-sub">What You Get</div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="count">50</div>
+      <h3>Essential</h3>
+      <p>Portraits, headshots, or event coverage. 50 edited and color-graded photos.</p>
+    </div>
+    <div class="service-card">
+      <div class="count">100</div>
+      <h3>Standard</h3>
+      <p>Full event coverage or extended session. 100 professionally edited photos.</p>
+    </div>
+    <div class="service-card">
+      <div class="count">300</div>
+      <h3>Complete</h3>
+      <p>Multi-day coverage, product launches, or comprehensive documentation. 300 photos.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
 
 <!-- ── Contact ── -->
 <section class="contact" id="contact">
-    <div class="section-head reveal">Connect</div>
-    <div class="socials reveal">
-        <a href="https://instagram.com/bislaaa" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://twitter.com/44ron44" target="_blank" rel="noopener">Twitter</a>
-    </div>
+  <div class="section-head reveal">Connect</div>
+
+  <div class="contact-email reveal">
+    <a href="mailto:44r0n.biz@gmail.com">44r0n.biz@gmail.com</a>
+  </div>
+
+  <div class="socials reveal">
+    <a href="https://instagram.com/bislaaaron" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://twitter.com/44ron44" target="_blank" rel="noopener">Twitter</a>
+    <a href="https://44ron.mypixieset.com" target="_blank" rel="noopener">Portfolio</a>
+  </div>
+
+  <div class="contact-note">
+    Based in SF, CA // Willing to travel Bay Area // Available for enterprise events
+  </div>
 </section>
 
-<footer>&copy; 2026 Aaron Bisla</footer>
+<footer>&copy; 2026 Aaron Bisla // e/motion</footer>
 
 <!-- ── HUD Overlay ── -->
 <div class="hud">
-    <div class="hud-corner hud-tl"></div>
-    <div class="hud-corner hud-tr"></div>
-    <div class="hud-corner hud-bl"></div>
-    <div class="hud-corner hud-br"></div>
-    <div class="hud-data">SYS::44RON // FRAME ACTIVE // ISO AUTO</div>
-    <div class="hud-ts" id="hud-clock">00:00:00</div>
-    <div class="hud-bar"></div>
-    <div class="hud-vline"></div>
+  <div class="hud-corner hud-tl"></div>
+  <div class="hud-corner hud-tr"></div>
+  <div class="hud-corner hud-bl"></div>
+  <div class="hud-corner hud-br"></div>
+  <div class="hud-data">SYS::E/MOTION // FRAME ACTIVE // ISO AUTO</div>
+  <div class="hud-ts" id="hud-clock">00:00:00</div>
+  <div class="hud-bar"></div>
 </div>
 
 <div class="glitch-band" id="glitch-band"></div>
 
 <!-- ── Viewer Modal ── -->
 <div class="viewer" id="viewer">
-    <div class="viewer-close" id="viewer-close">[esc] close</div>
-    <div class="viewer-frame" id="viewer-frame">
-        <img src="" alt="Full size" id="viewer-img">
-        <div class="viewer-bracket vb-tl"></div>
-        <div class="viewer-bracket vb-tr"></div>
-        <div class="viewer-bracket vb-bl"></div>
-        <div class="viewer-bracket vb-br"></div>
-        <div class="viewer-hud-top">
-            <span id="viewer-label">FILE::UNKNOWN</span>
-            <span id="viewer-res">--x--</span>
-        </div>
-        <div class="viewer-hud-bottom">
-            <span id="viewer-idx">01/07</span>
-            <span>RENDER::ACTIVE</span>
-        </div>
-        <div class="viewer-scanline"></div>
+  <div class="viewer-close" id="viewer-close">[esc] close</div>
+  <div class="viewer-frame" id="viewer-frame">
+    <img src="" alt="Full size" id="viewer-img">
+    <div class="viewer-bracket vb-tl"></div>
+    <div class="viewer-bracket vb-tr"></div>
+    <div class="viewer-bracket vb-bl"></div>
+    <div class="viewer-bracket vb-br"></div>
+    <div class="viewer-hud-top">
+      <span id="viewer-label">FILE::UNKNOWN</span>
+      <span id="viewer-res">--x--</span>
     </div>
+    <div class="viewer-hud-bottom">
+      <span id="viewer-idx">01/--</span>
+      <span>RENDER::ACTIVE</span>
+    </div>
+    <div class="viewer-scanline"></div>
+  </div>
 </div>
 
 <script>
 (function() {
-    // ── Inject hover overlays into every gallery item ──
-    document.querySelectorAll('.item').forEach((item, i) => {
-        const fname = (item.querySelector('img')?.alt || 'FRAME_' + i).toUpperCase().replace(/\s+/g, '_');
+  /* ── Inject hover overlays ── */
+  document.querySelectorAll('.item').forEach((item, i) => {
+    const fname = (item.querySelector('img')?.alt || 'FRAME_' + i).toUpperCase().replace(/\s+/g, '_');
+    const b = document.createElement('div'); b.className = 'hover-bracket'; item.appendChild(b);
+    const x = document.createElement('div'); x.className = 'hover-crosshair'; item.appendChild(x);
+    const d = document.createElement('div'); d.className = 'hover-data';
+    d.textContent = fname.slice(0, 22) + ' // F' + (i + 1).toString().padStart(2, '0');
+    item.appendChild(d);
+  });
 
-        const bracket = document.createElement('div');
-        bracket.className = 'hover-bracket';
-        item.appendChild(bracket);
+  /* ── Viewer modal ── */
+  const viewer = document.getElementById('viewer');
+  const vImg = document.getElementById('viewer-img');
+  const vLabel = document.getElementById('viewer-label');
+  const vRes = document.getElementById('viewer-res');
+  const vIdx = document.getElementById('viewer-idx');
+  const vClose = document.getElementById('viewer-close');
+  const allImages = Array.from(document.querySelectorAll('.item img, .hero-cell img'));
+  let ci = 0;
 
-        const crosshair = document.createElement('div');
-        crosshair.className = 'hover-crosshair';
-        item.appendChild(crosshair);
+  function openV(img) {
+    ci = allImages.indexOf(img);
+    showV();
+    viewer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function showV() {
+    const img = allImages[ci];
+    vImg.src = img.src; vImg.alt = img.alt;
+    vLabel.textContent = 'FILE::' + (img.alt || 'UNKNOWN').toUpperCase().replace(/\s+/g, '_').slice(0, 28);
+    vIdx.textContent = (ci + 1).toString().padStart(2, '0') + '/' + allImages.length.toString().padStart(2, '0');
+    const t = new Image(); t.onload = () => { vRes.textContent = t.naturalWidth + 'x' + t.naturalHeight; }; t.src = img.src;
+  }
+  function closeV() { viewer.classList.remove('active'); document.body.style.overflow = ''; }
+  function navV(d) { ci = (ci + d + allImages.length) % allImages.length; showV(); }
 
-        const data = document.createElement('div');
-        data.className = 'hover-data';
-        data.textContent = fname.slice(0, 20) + ' // F' + (i + 1).toString().padStart(2, '0');
-        item.appendChild(data);
+  allImages.forEach(img => { img.style.cursor = 'pointer'; img.addEventListener('click', () => openV(img)); });
+  viewer.addEventListener('click', e => { if (e.target === viewer) closeV(); });
+  vClose.addEventListener('click', closeV);
+  document.addEventListener('keydown', e => {
+    if (!viewer.classList.contains('active')) return;
+    if (e.key === 'Escape') closeV();
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navV(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navV(-1);
+  });
+
+  /* ── Scroll reveal ── */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ── Stagger gallery items ── */
+  const so = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.querySelectorAll('.item').forEach((item, i) => {
+        setTimeout(() => item.classList.add('vis'), i * 100);
+      });
+      so.unobserve(entry.target);
     });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.stagger').forEach(g => so.observe(g));
 
-    // ── Viewer modal ──
-    const viewer = document.getElementById('viewer');
-    const vImg = document.getElementById('viewer-img');
-    const vLabel = document.getElementById('viewer-label');
-    const vRes = document.getElementById('viewer-res');
-    const vIdx = document.getElementById('viewer-idx');
-    const vClose = document.getElementById('viewer-close');
-
-    const allImages = Array.from(document.querySelectorAll('.item img, .hero-cell img'));
-    let currentIdx = 0;
-
-    function openViewer(img) {
-        currentIdx = allImages.indexOf(img);
-        vImg.src = img.src;
-        vImg.alt = img.alt;
-        vLabel.textContent = 'FILE::' + (img.alt || 'UNKNOWN').toUpperCase().replace(/\s+/g, '_').slice(0, 30);
-        vIdx.textContent = (currentIdx + 1).toString().padStart(2, '0') + '/' + allImages.length.toString().padStart(2, '0');
-
-        // Get natural dimensions once loaded
-        const tmpImg = new Image();
-        tmpImg.onload = () => { vRes.textContent = tmpImg.naturalWidth + 'x' + tmpImg.naturalHeight; };
-        tmpImg.src = img.src;
-
-        viewer.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeViewer() {
-        viewer.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function navViewer(dir) {
-        currentIdx = (currentIdx + dir + allImages.length) % allImages.length;
-        const img = allImages[currentIdx];
-        vImg.src = img.src;
-        vImg.alt = img.alt;
-        vLabel.textContent = 'FILE::' + (img.alt || 'UNKNOWN').toUpperCase().replace(/\s+/g, '_').slice(0, 30);
-        vIdx.textContent = (currentIdx + 1).toString().padStart(2, '0') + '/' + allImages.length.toString().padStart(2, '0');
-        const tmpImg = new Image();
-        tmpImg.onload = () => { vRes.textContent = tmpImg.naturalWidth + 'x' + tmpImg.naturalHeight; };
-        tmpImg.src = img.src;
-    }
-
-    allImages.forEach(img => {
-        img.style.cursor = 'pointer';
-        img.addEventListener('click', () => openViewer(img));
+  /* ── Parallax ── */
+  (function raf() {
+    document.querySelectorAll('.photo-grid .item img').forEach(img => {
+      const r = img.getBoundingClientRect();
+      const off = ((r.top + r.height / 2) - window.innerHeight / 2) * 0.035;
+      img.style.transform = 'translateY(' + off + 'px) scale(1.1)';
     });
-
-    viewer.addEventListener('click', e => {
-        if (e.target === viewer) closeViewer();
-    });
-    vClose.addEventListener('click', closeViewer);
-
-    document.addEventListener('keydown', e => {
-        if (!viewer.classList.contains('active')) return;
-        if (e.key === 'Escape') closeViewer();
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navViewer(1);
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navViewer(-1);
-    });
-
-    // ── Scroll reveal ──
-    const io = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
-    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal, .reveal-l, .reveal-r').forEach(el => io.observe(el));
-
-    // ── Stagger gallery items ──
-    const staggerObs = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            entry.target.querySelectorAll('.item').forEach((item, i) => {
-                setTimeout(() => item.classList.add('vis'), i * 120);
-            });
-            staggerObs.unobserve(entry.target);
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.stagger').forEach(g => staggerObs.observe(g));
-
-    // ── Parallax ──
-    function raf() {
-        document.querySelectorAll('.mono-grid .item img, .color-grid .item img').forEach(img => {
-            const r = img.getBoundingClientRect();
-            const off = ((r.top + r.height / 2) - window.innerHeight / 2) * 0.04;
-            img.style.transform = `translateY(${off}px) scale(1.1)`;
-        });
-        requestAnimationFrame(raf);
-    }
     requestAnimationFrame(raf);
+  })();
 
-    // ── Smooth nav ──
-    document.querySelectorAll('nav a').forEach(a => {
-        a.addEventListener('click', e => {
-            e.preventDefault();
-            const t = document.querySelector(a.getAttribute('href'));
-            if (t) t.scrollIntoView({ behavior: 'smooth' });
-        });
+  /* ── Smooth nav ── */
+  document.querySelectorAll('nav a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
     });
+  });
 
-    // ── Hero zoom origins ──
-    document.querySelectorAll('.hero-cell img').forEach(img => {
-        img.style.transformOrigin = `${30 + Math.random() * 40}% ${30 + Math.random() * 40}%`;
-    });
+  /* ── Hero zoom origins ── */
+  document.querySelectorAll('.hero-cell img').forEach(img => {
+    img.style.transformOrigin = (30 + Math.random() * 40) + '% ' + (30 + Math.random() * 40) + '%';
+  });
 
-    // ── HUD clock ──
-    const hudClock = document.getElementById('hud-clock');
-    if (hudClock) {
-        setInterval(() => { hudClock.textContent = new Date().toTimeString().slice(0, 8); }, 1000);
-    }
+  /* ── HUD clock ── */
+  const hc = document.getElementById('hud-clock');
+  if (hc) setInterval(() => { hc.textContent = new Date().toTimeString().slice(0, 8); }, 1000);
 
-    // ── Glitch band ──
-    const band = document.getElementById('glitch-band');
-    if (band) {
-        (function fireGlitch() {
-            band.style.top = (Math.random() * window.innerHeight) + 'px';
-            band.style.height = (1 + Math.random() * 3) + 'px';
-            band.style.opacity = 0.15 + Math.random() * 0.2;
-            band.style.background = Math.random() > 0.5 ? 'var(--cyan)' : 'var(--magenta)';
-            setTimeout(() => { band.style.opacity = 0; }, 50 + Math.random() * 100);
-            setTimeout(fireGlitch, 3000 + Math.random() * 8000);
-        })();
-    }
+  /* ── Glitch band ── */
+  const band = document.getElementById('glitch-band');
+  if (band) {
+    (function fire() {
+      band.style.top = (Math.random() * window.innerHeight) + 'px';
+      band.style.height = (1 + Math.random() * 3) + 'px';
+      band.style.opacity = 0.1 + Math.random() * 0.15;
+      band.style.background = Math.random() > 0.5 ? 'var(--accent)' : 'var(--accent2)';
+      setTimeout(() => { band.style.opacity = 0; }, 40 + Math.random() * 80);
+      setTimeout(fire, 4000 + Math.random() * 10000);
+    })();
+  }
 })();
 </script>
 </body>
