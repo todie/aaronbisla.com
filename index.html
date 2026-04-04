@@ -11,21 +11,44 @@
     <meta property="og:url" content="https://aaronbisla.com">
     <link rel="canonical" href="https://aaronbisla.com">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff00aa;
+            --neon-green: #39ff14;
+            --bg: #050505;
+            --text: #e0e0e0;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background: #0a0a0a;
-            color: #e0e0e0;
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Inter', -apple-system, sans-serif;
             font-weight: 300;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* -- Scanlines overlay -- */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.03) 2px,
+                rgba(0, 0, 0, 0.03) 4px
+            );
         }
 
         /* -- Header -- */
@@ -35,171 +58,356 @@
             left: 0;
             right: 0;
             z-index: 100;
-            padding: 2rem 3rem;
+            padding: 1.5rem 3rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            mix-blend-mode: difference;
+            backdrop-filter: blur(8px);
+            background: rgba(5, 5, 5, 0.6);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.08);
         }
 
         .logo {
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 0.15em;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            color: #fff;
+            color: var(--neon-cyan);
             text-decoration: none;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
         }
 
-        nav {
-            display: flex;
-            gap: 2.5rem;
-        }
+        nav { display: flex; gap: 2.5rem; }
 
         nav a {
-            color: #fff;
+            color: var(--text);
             text-decoration: none;
-            font-size: 0.85rem;
-            letter-spacing: 0.1em;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            opacity: 0.7;
-            transition: opacity 0.3s;
+            opacity: 0.5;
+            transition: all 0.3s;
         }
 
         nav a:hover {
             opacity: 1;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
 
-        /* -- Hero -- */
+        /* -- Hero collage -- */
         .hero {
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 3px;
             position: relative;
             overflow: hidden;
         }
 
-        .hero-bg {
+        .hero-cell {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: contrast(1.3) brightness(0.7);
+            transition: transform 12s ease-out, filter 1s ease;
+            transform: scale(1.08);
+        }
+
+        .hero-cell:hover img {
+            filter: contrast(1.4) brightness(0.85);
+            transform: scale(1.02);
+        }
+
+        .hero-cell:nth-child(1) { grid-row: span 2; }
+        .hero-cell:nth-child(4) { grid-column: span 2; }
+
+        .hero-overlay {
             position: absolute;
             inset: 0;
-            background: url('images/DSC00143-9d1ac48a-2500.jpg') center/cover no-repeat;
-            filter: brightness(0.4);
-            transform: scale(1.05);
-            transition: transform 8s ease-out;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at center, rgba(5,5,5,0.5) 0%, rgba(5,5,5,0.2) 70%);
+            pointer-events: none;
         }
 
-        .hero:hover .hero-bg {
-            transform: scale(1);
-        }
-
-        .hero-text {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-        }
-
-        .hero-text h1 {
-            font-size: clamp(2.5rem, 8vw, 6rem);
-            font-weight: 300;
-            letter-spacing: 0.2em;
+        .hero-overlay h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(2rem, 7vw, 5.5rem);
+            font-weight: 700;
+            letter-spacing: 0.25em;
             text-transform: uppercase;
             color: #fff;
-            margin-bottom: 1rem;
+            position: relative;
+            animation: glitch-text 8s infinite;
         }
 
-        .hero-text p {
-            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+        .hero-overlay h1::before,
+        .hero-overlay h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+        }
+
+        .hero-overlay h1::before {
+            color: var(--neon-cyan);
+            z-index: -1;
+            animation: glitch-1 3s infinite linear alternate-reverse;
+        }
+
+        .hero-overlay h1::after {
+            color: var(--neon-magenta);
+            z-index: -2;
+            animation: glitch-2 2s infinite linear alternate-reverse;
+        }
+
+        .hero-overlay .tagline {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-top: 1rem;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
             letter-spacing: 0.3em;
             text-transform: uppercase;
-            opacity: 0.6;
+            opacity: 0.3;
+            animation: pulse-down 2s infinite;
         }
 
-        /* -- Gallery -- */
-        .gallery {
+        @keyframes pulse-down {
+            0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.3; }
+            50% { transform: translateX(-50%) translateY(8px); opacity: 0.6; }
+        }
+
+        @keyframes glitch-1 {
+            0%, 95% { clip-path: inset(0); transform: translate(0); }
+            96% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 0); }
+            97% { clip-path: inset(50% 0 20% 0); transform: translate(3px, 0); }
+            98% { clip-path: inset(70% 0 5% 0); transform: translate(-2px, 0); }
+            99% { clip-path: inset(10% 0 80% 0); transform: translate(2px, 0); }
+            100% { clip-path: inset(0); transform: translate(0); }
+        }
+
+        @keyframes glitch-2 {
+            0%, 93% { clip-path: inset(0); transform: translate(0); }
+            94% { clip-path: inset(40% 0 30% 0); transform: translate(4px, 0); }
+            95% { clip-path: inset(10% 0 70% 0); transform: translate(-4px, 0); }
+            96% { clip-path: inset(60% 0 15% 0); transform: translate(2px, 0); }
+            97% { clip-path: inset(0); transform: translate(0); }
+        }
+
+        @keyframes glitch-text {
+            0%, 90% { text-shadow: none; }
+            91% { text-shadow: -3px 0 var(--neon-cyan), 3px 0 var(--neon-magenta); }
+            92% { text-shadow: 3px 0 var(--neon-cyan), -3px 0 var(--neon-magenta); }
+            93% { text-shadow: none; }
+            96% { text-shadow: -2px 0 var(--neon-magenta), 2px 0 var(--neon-cyan); }
+            97% { text-shadow: none; }
+        }
+
+        /* -- Section divider -- */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            opacity: 0.15;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 400;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            opacity: 0.25;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-label::before {
+            content: '//';
+            color: var(--neon-cyan);
+            opacity: 0.6;
+            margin-right: 0.8em;
+        }
+
+        .section-label::after {
+            content: '//';
+            color: var(--neon-cyan);
+            opacity: 0.6;
+            margin-left: 0.8em;
+        }
+
+        /* -- B&W Section -- */
+        .bw-section {
             padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .bw-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        .gallery h2 {
-            font-size: 0.8rem;
-            font-weight: 400;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            opacity: 0.4;
-            margin-bottom: 3rem;
-            text-align: center;
+        .bw-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: auto;
         }
 
-        .grid {
+        .bw-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: grayscale(100%) contrast(1.4) brightness(0.9);
+            transition: filter 0.8s ease, transform 0.8s ease;
+        }
+
+        .bw-item:hover img {
+            filter: grayscale(30%) contrast(1.3) brightness(1);
+            transform: scale(1.04);
+        }
+
+        .bw-item.accent img {
+            filter: grayscale(100%) contrast(1.4) brightness(0.9);
+            transition: filter 0.8s ease, transform 0.8s ease;
+        }
+
+        .bw-item.accent:hover img {
+            filter: grayscale(0%) contrast(1.2) brightness(1) saturate(1.8);
+            transform: scale(1.04);
+        }
+
+        .bw-item.span-2 { grid-column: span 2; }
+        .bw-item.row-2 { grid-row: span 2; }
+
+        /* Color splash label on accent items */
+        .bw-item.accent::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--neon-magenta);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .bw-item.accent:hover::after {
+            opacity: 1;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        /* -- Color Section -- */
+        .color-section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .color-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 280px;
+            gap: 4px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .grid-item {
+        .color-item {
             position: relative;
             overflow: hidden;
             cursor: pointer;
         }
 
-        .grid-item img {
+        .color-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.6s ease, filter 0.6s ease;
-            filter: grayscale(20%);
+            filter: contrast(1.2) saturate(1.3);
+            transition: transform 0.8s ease, filter 0.6s ease;
         }
 
-        .grid-item:hover img {
-            transform: scale(1.03);
-            filter: grayscale(0%);
+        .color-item:hover img {
+            transform: scale(1.05);
+            filter: contrast(1.3) saturate(1.5) brightness(1.05);
         }
 
-        .grid-item.tall {
-            grid-row: span 2;
+        .color-item.span-2 { grid-column: span 2; }
+        .color-item.row-2 { grid-row: span 2; }
+
+        /* Neon border on hover */
+        .color-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            border: 1px solid transparent;
+            transition: border-color 0.5s;
+            pointer-events: none;
+        }
+
+        .color-item:hover::before {
+            border-color: var(--neon-cyan);
+            box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1);
         }
 
         /* -- About -- */
         .about {
             padding: 8rem 2rem;
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             text-align: center;
-        }
-
-        .about h2 {
-            font-size: 0.8rem;
-            font-weight: 400;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            opacity: 0.4;
-            margin-bottom: 2rem;
         }
 
         .about p {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            opacity: 0.8;
-            max-width: 600px;
-            margin: 0 auto;
+            font-size: 1.15rem;
+            line-height: 2;
+            opacity: 0.7;
         }
 
-        /* -- Contact / Footer -- */
+        .about p span {
+            color: var(--neon-cyan);
+            opacity: 1;
+        }
+
+        /* -- Contact -- */
         .contact {
             padding: 6rem 2rem 3rem;
             text-align: center;
-        }
-
-        .contact h2 {
-            font-size: 0.8rem;
-            font-weight: 400;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            opacity: 0.4;
-            margin-bottom: 2rem;
         }
 
         .socials {
@@ -210,27 +418,32 @@
         }
 
         .socials a {
-            color: #e0e0e0;
+            color: var(--text);
             text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            opacity: 0.5;
-            transition: opacity 0.3s;
+            opacity: 0.4;
+            transition: all 0.3s;
+            padding-bottom: 4px;
             border-bottom: 1px solid transparent;
         }
 
         .socials a:hover {
             opacity: 1;
-            border-bottom-color: #e0e0e0;
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
         }
 
         footer {
             padding: 2rem;
             text-align: center;
-            font-size: 0.75rem;
-            opacity: 0.25;
-            letter-spacing: 0.1em;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            opacity: 0.15;
+            letter-spacing: 0.2em;
         }
 
         /* -- Lightbox -- */
@@ -239,56 +452,85 @@
             position: fixed;
             inset: 0;
             z-index: 200;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.97);
             align-items: center;
             justify-content: center;
             cursor: zoom-out;
         }
 
-        .lightbox.active {
-            display: flex;
-        }
+        .lightbox.active { display: flex; }
 
         .lightbox img {
-            max-width: 90vw;
-            max-height: 90vh;
+            max-width: 92vw;
+            max-height: 92vh;
             object-fit: contain;
+            border: 1px solid rgba(0, 240, 255, 0.1);
         }
 
-        /* -- Responsive -- */
-        @media (max-width: 768px) {
-            header {
-                padding: 1.5rem;
-            }
-
-            nav {
-                gap: 1.5rem;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .grid-item.tall {
-                grid-row: span 1;
-            }
-
-            .socials {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-        }
-
-        /* -- Fade-in animation -- */
+        /* -- Fade animations -- */
         .fade-in {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
         }
 
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .fade-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .fade-right {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* -- Parallax containers -- */
+        .parallax-wrap {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parallax-wrap img {
+            will-change: transform;
+        }
+
+        /* -- Responsive -- */
+        @media (max-width: 1024px) {
+            .color-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 250px; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem 1.5rem; }
+            nav { gap: 1.5rem; }
+            .hero {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr 1fr;
+            }
+            .hero-cell:nth-child(1) { grid-row: span 2; }
+            .hero-cell:nth-child(4) { grid-column: span 2; }
+            .hero-overlay h1 { letter-spacing: 0.15em; }
+            .bw-grid { grid-template-columns: 1fr 1fr; }
+            .bw-item.span-2 { grid-column: span 2; }
+            .color-grid { grid-template-columns: 1fr; grid-auto-rows: 300px; }
+            .color-item.span-2 { grid-column: span 1; }
+            .socials { flex-direction: column; gap: 1.5rem; }
         }
     </style>
 </head>
@@ -297,64 +539,118 @@
 <header>
     <a href="#" class="logo">Aaron Bisla</a>
     <nav>
-        <a href="#work">Work</a>
+        <a href="#mono">Mono</a>
+        <a href="#color">Color</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
     </nav>
 </header>
 
+<!-- Hero collage -->
 <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-text">
-        <h1>Aaron Bisla</h1>
-        <p>Photographer &amp; Creative</p>
+    <div class="hero-cell">
+        <img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait">
+    </div>
+    <div class="hero-cell">
+        <img src="images/DSC01191-f5e79821-2500.jpg" alt="B&W portrait">
+    </div>
+    <div class="hero-cell">
+        <img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance">
+    </div>
+    <div class="hero-cell">
+        <img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Landscape">
+    </div>
+    <div class="hero-cell">
+        <img src="images/00690_22A-27a90197-2500.jpg" alt="Film camera">
+    </div>
+
+    <div class="hero-overlay">
+        <h1 data-text="Aaron Bisla">Aaron Bisla</h1>
+        <div class="tagline">Photographer &amp; Creative</div>
+    </div>
+    <div class="scroll-indicator">scroll</div>
+</section>
+
+<!-- B&W with color splash -->
+<section class="bw-section" id="mono">
+    <div class="section-label fade-in">Monochrome</div>
+
+    <div class="bw-grid">
+        <div class="bw-item row-2 parallax-wrap fade-left">
+            <img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait" loading="lazy">
+        </div>
+        <div class="bw-item span-2 parallax-wrap fade-right">
+            <img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Landscape" loading="lazy">
+        </div>
+        <div class="bw-item accent parallax-wrap fade-in">
+            <img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait — color reveals on hover" loading="lazy">
+        </div>
+        <div class="bw-item parallax-wrap fade-in">
+            <img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street" loading="lazy">
+        </div>
+        <div class="bw-item span-2 accent parallax-wrap fade-left">
+            <img src="images/DSC01513-343f182c-1500.jpg" alt="Studio — color reveals on hover" loading="lazy">
+        </div>
+        <div class="bw-item parallax-wrap fade-right">
+            <img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance" loading="lazy">
+        </div>
     </div>
 </section>
 
-<section class="gallery" id="work">
-    <h2>Selected Work</h2>
-    <div class="grid">
-        <div class="grid-item tall fade-in">
-            <img src="images/DSC01191-f5e79821-2500.jpg" alt="Portrait — black and white" loading="lazy">
+<div class="divider"></div>
+
+<!-- Full color -->
+<section class="color-section" id="color">
+    <div class="section-label fade-in">Chromatic</div>
+
+    <div class="color-grid">
+        <div class="color-item span-2 row-2 parallax-wrap fade-left">
+            <img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy">
         </div>
-        <div class="grid-item fade-in">
-            <img src="images/DSC01513-343f182c-1500.jpg" alt="Portrait — studio" loading="lazy">
+        <div class="color-item parallax-wrap fade-right">
+            <img src="images/00690_22A-27a90197-2500.jpg" alt="Film — warm" loading="lazy">
         </div>
-        <div class="grid-item fade-in">
-            <img src="images/00690_22A-27a90197-2500.jpg" alt="Film — warm tones" loading="lazy">
+        <div class="color-item parallax-wrap fade-in">
+            <img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Performance" loading="lazy">
         </div>
-        <div class="grid-item tall fade-in">
-            <img src="images/DSC01266-054fa899-2500.jpg" alt="Portrait — neon" loading="lazy">
+        <div class="color-item parallax-wrap fade-in">
+            <img src="images/DSC01513-343f182c-1500.jpg" alt="Studio" loading="lazy">
         </div>
-        <div class="grid-item fade-in">
-            <img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Landscape — open road" loading="lazy">
+        <div class="color-item parallax-wrap fade-right">
+            <img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road" loading="lazy">
         </div>
-        <div class="grid-item fade-in">
-            <img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Film scan — street" loading="lazy">
+        <div class="color-item span-2 parallax-wrap fade-left">
+            <img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street" loading="lazy">
         </div>
-        <div class="grid-item fade-in">
-            <img src="images/Scan295-2-8bd1a779-2500.jpg" alt="Film scan — performance" loading="lazy">
+        <div class="color-item span-2 parallax-wrap fade-right">
+            <img src="images/DSC01191-f5e79821-2500.jpg" alt="B&W portrait" loading="lazy">
         </div>
     </div>
 </section>
 
+<div class="divider"></div>
+
+<!-- About -->
 <section class="about" id="about">
-    <h2>About</h2>
-    <p class="fade-in">Capturing people and places on film and digital. Based in the moments between the planned ones.</p>
+    <div class="section-label fade-in">About</div>
+    <p class="fade-in">
+        Capturing people and places on <span>film</span> and <span>digital</span>.
+        Based in the moments between the planned ones.
+    </p>
 </section>
 
+<!-- Contact -->
 <section class="contact" id="contact">
-    <h2>Connect</h2>
+    <div class="section-label fade-in">Connect</div>
     <div class="socials fade-in">
         <a href="https://instagram.com/bislaaa" target="_blank" rel="noopener">Instagram</a>
         <a href="https://twitter.com/44ron44" target="_blank" rel="noopener">Twitter</a>
     </div>
 </section>
 
-<footer>
-    &copy; 2026 Aaron Bisla
-</footer>
+<footer>&copy; 2026 Aaron Bisla</footer>
 
+<!-- Lightbox -->
 <div class="lightbox" id="lightbox">
     <img src="" alt="Full size">
 </div>
@@ -364,7 +660,7 @@
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = lightbox.querySelector('img');
 
-    document.querySelectorAll('.grid-item img').forEach(img => {
+    document.querySelectorAll('.bw-item img, .color-item img, .hero-cell img').forEach(img => {
         img.addEventListener('click', () => {
             lightboxImg.src = img.src;
             lightboxImg.alt = img.alt;
@@ -372,32 +668,52 @@
         });
     });
 
-    lightbox.addEventListener('click', () => {
-        lightbox.classList.remove('active');
-    });
-
+    lightbox.addEventListener('click', () => lightbox.classList.remove('active'));
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') lightbox.classList.remove('active');
     });
 
-    // Scroll fade-in
+    // Scroll-triggered fade-in
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    document.querySelectorAll('.fade-in, .fade-left, .fade-right').forEach(el => observer.observe(el));
 
-    // Smooth scroll
+    // Parallax on scroll
+    const parallaxItems = document.querySelectorAll('.parallax-wrap img');
+
+    function updateParallax() {
+        const scrollY = window.scrollY;
+        parallaxItems.forEach(img => {
+            const rect = img.parentElement.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
+            const viewCenter = window.innerHeight / 2;
+            const offset = (center - viewCenter) * 0.06;
+            img.style.transform = `translateY(${offset}px) scale(1.08)`;
+        });
+        requestAnimationFrame(updateParallax);
+    }
+    requestAnimationFrame(updateParallax);
+
+    // Smooth scroll for nav
     document.querySelectorAll('nav a').forEach(a => {
         a.addEventListener('click', e => {
             e.preventDefault();
             const target = document.querySelector(a.getAttribute('href'));
             if (target) target.scrollIntoView({ behavior: 'smooth' });
         });
+    });
+
+    // Randomize hero cell slow-zoom direction on load
+    document.querySelectorAll('.hero-cell img').forEach(img => {
+        const x = (Math.random() - 0.5) * 4;
+        const y = (Math.random() - 0.5) * 4;
+        img.style.transformOrigin = `${50 + x * 5}% ${50 + y * 5}%`;
     });
 </script>
 
