@@ -1,0 +1,73 @@
+name: Sync gallery from Lightroom
+
+# Pulls Aaron's public Lightroom album, refreshes images/ + gallery.json, and
+# opens a PR (never pushes to main directly — per repo policy). Merge the PR to publish.
+#
+# How Aaron reorders: drag in Lightroom (or the site's terminal `login` -> export),
+# apply in Lightroom. Next run picks up the new album order.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6h; no-ops (no PR) when the album is unchanged
+  workflow_dispatch: {}      # manual "Run workflow" button for an immediate sync
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-gallery
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Import Lightroom album
+        id: import
+        # TODO: pin to a commit SHA once verified on the first run (supply-chain hardening).
+        uses: abstrctn/lightroom-album-import@v0.1.1
+        with:
+          album_url: "https://lightroom.adobe.com/gallery/ee8f0e17c42b49e589caf9d41ee45a13"
+          download_directory: "images"
+          rendition_type: "2048"        # max available on the unauthenticated public API
+          add_exif_metadata: "false"    # captions come from sidecars; avoids exiftool dependency
+          save_json: "true"             # per-image metadata sidecars (for captions)
+          optimize_image_downloads: "true"
+          hide_stacked_assets: "true"
+
+      - name: Build gallery.json + repoint SEO images
+        env:
+          SORTED_PATHS: ${{ steps.import.outputs.sorted_image_paths }}
+          ALBUM_ID: ${{ steps.import.outputs.album_id }}
+        run: python3 scripts/build-gallery-manifest.py
+
+      - name: Remove metadata sidecars
+        run: |
+          rm -f images/*.json images/*.JSON images/*.xmp images/*.XMP || true
+
+      - name: Open PR if the album changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          base: main
+          branch: gallery-sync
+          delete-branch: true
+          commit-message: "chore: sync gallery from Lightroom (${{ steps.import.outputs.album_name }})"
+          title: "Gallery sync from Lightroom"
+          body: |
+            Automated sync from Aaron's public Lightroom album
+            (`${{ steps.import.outputs.album_name }}` / `${{ steps.import.outputs.album_id }}`).
+
+            - `images/` refreshed with 2048px renditions
+            - `gallery.json` regenerated in album order
+            - `og:image` / JSON-LD repointed at the first image
+
+            Review the image diff, then **merge to publish**. Closing without merging
+            keeps the live site as-is; the next run reopens this branch if still changed.
+          add-paths: |
+            images/**
+            gallery.json
+            index.html
