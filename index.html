@@ -445,6 +445,41 @@ nav a:hover::after { width: 100%; }
 .c8  { grid-column: 9/13; grid-row: 4/7; }
 .c9  { grid-column: 1/4;  grid-row: 6/7; }
 
+/* ── Auto grid (Lightroom-driven · varies with photo count) ── */
+.photo-grid.auto { grid-auto-flow: dense; }
+.photo-grid.auto .item            { grid-column: span 4; grid-row: span 2; }
+.photo-grid.auto .item.s-wide     { grid-column: span 8; grid-row: span 2; }
+.photo-grid.auto .item.s-tall     { grid-column: span 4; grid-row: span 3; }
+.photo-grid.auto .item.s-big      { grid-column: span 8; grid-row: span 3; }
+.grid-loading {
+  grid-column: 1/-1; text-align: center; padding: 4rem 0;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.25em; color: var(--accent); opacity: 0.6;
+  text-transform: uppercase;
+}
+@media (max-width: 760px) {
+  .photo-grid.auto { grid-template-columns: repeat(6, 1fr); }
+  .photo-grid.auto .item,
+  .photo-grid.auto .item.s-wide,
+  .photo-grid.auto .item.s-big      { grid-column: span 3; grid-row: span 2; }
+  .photo-grid.auto .item.s-tall,
+  .photo-grid.auto .item.s-narrow   { grid-column: span 3; grid-row: span 3; }
+}
+
+/* ── Curator mode (hidden · unlocked via terminal `login`) ── */
+body.curator #gallery-grid .item {
+  cursor: grab; outline: 1px dashed rgba(255,136,0,0.5); outline-offset: -2px;
+}
+body.curator #gallery-grid .item.dragging { opacity: 0.35; cursor: grabbing; }
+body.curator #gallery-grid .item img { pointer-events: none; }
+.curator-banner {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9990; display: none;
+  background: var(--accent); color: #000; text-align: center; padding: 7px 10px;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+body.curator .curator-banner { display: block; }
+
 /* ── Item hover — TARGETING RETICLE ── */
 .item .hover-data {
   position: absolute; bottom: 8px; left: 10px;
@@ -961,41 +996,12 @@ body.t-cyber { --accent: #00f0ff; --accent2: #ff00aa; --text-data: #00f0ff; }
   <p>Community Technographer at ACCELR8 Hacker House, San Francisco</p>
 </div>
 
-<!-- ── Monochrome Gallery ── -->
+<!-- ── Gallery (synced from Lightroom · see gallery.json + .github/workflows/sync-gallery.yml) ── -->
 <section class="gallery-section" id="work">
-  <div class="section-head reveal">Monochrome</div>
-  <div class="section-sub reveal">Film Scans + Digital B&amp;W</div>
-  <div class="photo-grid grid-mono stagger">
-    <div class="item g1 accent"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy"></div>
-    <div class="item g2"><img src="images/DSC08405-1000.jpg" alt="Founder pitch" loading="lazy"></div>
-    <div class="item g3"><img src="images/Scan281-2-2c3067f2-2500.jpg" alt="Street conversation" loading="lazy"></div>
-    <div class="item g4"><img src="images/DSC08226-1000.jpg" alt="Hacker house whiteboard" loading="lazy"></div>
-    <div class="item g5 accent"><img src="images/DSC01513-343f182c-1500.jpg" alt="Creative duo" loading="lazy"></div>
-    <div class="item g6"><img src="images/Scan153-1000.jpg" alt="Mosh pit energy" loading="lazy"></div>
-    <div class="item g7"><img src="images/DSC08616-1000.jpg" alt="Founder presenting" loading="lazy"></div>
-    <div class="item g8"><img src="images/53841852-1000.jpg" alt="Sleep Shop live" loading="lazy"></div>
-    <div class="item g9 accent"><img src="images/DSC01191-f5e79821-2500.jpg" alt="Low angle portrait" loading="lazy"></div>
-    <div class="item g10"><img src="images/DSC09566-1000.jpg" alt="Rooftop social" loading="lazy"></div>
-    <div class="item g11"><img src="images/DSC09868-1000.jpg" alt="Intimate moment" loading="lazy"></div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ── Chromatic Gallery ── -->
-<section class="gallery-section">
-  <div class="section-head reveal">Chromatic</div>
-  <div class="section-sub reveal">Color Film + Digital + Cinestill</div>
-  <div class="photo-grid grid-color stagger">
-    <div class="item c1"><img src="images/DSC01266-054fa899-2500.jpg" alt="Neon portrait" loading="lazy"></div>
-    <div class="item c2"><img src="images/00690_22A-27a90197-2500.jpg" alt="Film warm tones" loading="lazy"></div>
-    <div class="item c3"><img src="images/C5742T01-1000.jpg" alt="Cinestill founder" loading="lazy"></div>
-    <div class="item c4"><img src="images/000164310014-1000.jpg" alt="Light installation" loading="lazy"></div>
-    <div class="item c5"><img src="images/DSC00143-9d1ac48a-2500.jpg" alt="Open road" loading="lazy"></div>
-    <div class="item c6"><img src="images/Scan209-1000.jpg" alt="Film scan" loading="lazy"></div>
-    <div class="item c7"><img src="images/DSC07345-1000.jpg" alt="Documentary" loading="lazy"></div>
-    <div class="item c8"><img src="images/000714720016-1000.jpg" alt="Film portrait" loading="lazy"></div>
-    <div class="item c9"><img src="images/Scan179-1000.jpg" alt="Street film" loading="lazy"></div>
+  <div class="section-head reveal">Selected Work</div>
+  <div class="section-sub reveal">Curated in Lightroom // Film + Digital</div>
+  <div class="photo-grid grid-color stagger auto" id="gallery-grid">
+    <div class="grid-loading">ESTABLISHING VISUAL FEED&hellip;</div>
   </div>
 </section>
 
@@ -1120,6 +1126,11 @@ body.t-cyber { --accent: #00f0ff; --accent2: #ff00aa; --text-data: #00f0ff; }
   </div>
 </div>
 
+<!-- Curator mode banner (shown only after terminal `login`) -->
+<div class="curator-banner" id="curator-banner">
+  CURATOR MODE · drag photos to reorder · <b>export</b> to copy order · <b>logout</b> to exit · (preview is local to this browser)
+</div>
+
 <!-- Konami -->
 <div class="konami-ov" id="konami"><span></span></div>
 
@@ -1190,7 +1201,100 @@ body.t-cyber { --accent: #00f0ff; --accent2: #ff00aa; --text-data: #00f0ff; }
   /* ═══════════════════════════════════════════
      MAIN SITE INIT
      ═══════════════════════════════════════════ */
-  function initSite() {
+  async function initSite() {
+
+    /* ═══════════════════════════════════════════
+       GALLERY · rendered from Lightroom manifest (gallery.json)
+       Synced by .github/workflows/sync-gallery.yml (PR-per-sync).
+       ═══════════════════════════════════════════ */
+    let curatorMode = false;
+    const CURATOR_PASS = '44ronb15l4';       // obscurity only — static site, NOT real auth
+    const galleryGrid = document.getElementById('gallery-grid');
+    // Widths sum to 12 per visual row (8+4, 4+8, 4+4+4, 8+4) so dense flow leaves no gaps.
+    const SPANS = ['s-big', '', 's-tall', 's-wide', '', '', '', 's-wide', 's-tall'];
+
+    function loadCuratorOrder() {
+      try { return JSON.parse(localStorage.getItem('lr_curator_order') || 'null'); } catch (e) { return null; }
+    }
+    function saveCuratorOrder(arr) { localStorage.setItem('lr_curator_order', JSON.stringify(arr)); }
+    function currentOrder() {
+      return Array.from(document.querySelectorAll('#gallery-grid .item')).map(el => el.dataset.file);
+    }
+    // Reorder items: files listed in `order` lead (in that order); the rest keep their current order.
+    function applyOrder(items, order) {
+      if (!order || !order.length) return items;
+      const byFile = {}; items.forEach(it => { byFile[it.file] = it; });
+      const front = order.map(f => byFile[f]).filter(Boolean);
+      const seen = new Set(order);
+      return front.concat(items.filter(it => !seen.has(it.file)));
+    }
+    async function fetchOrderFile(path) {
+      try { const r = await fetch(path, { cache: 'no-cache' }); if (!r.ok) return null; return await r.json(); }
+      catch (e) { return null; }
+    }
+
+    async function renderGallery() {
+      if (!galleryGrid) return;
+      let manifest;
+      try {
+        const res = await fetch('gallery.json', { cache: 'no-cache' });
+        manifest = await res.json();
+      } catch (e) {
+        galleryGrid.innerHTML = '<div class="grid-loading">visual feed unavailable</div>';
+        return;
+      }
+      let items = (manifest.items || []).filter(it => it && it.file);
+      // 1) Published manual override (gallery-order.json) — committed to the repo, affects ALL visitors.
+      const published = await fetchOrderFile('gallery-order.json');
+      items = applyOrder(items, published);
+      // 2) This browser's unsaved draft (localStorage) — local preview only, never published until exported.
+      items = applyOrder(items, loadCuratorOrder());
+      // Hero collage tracks the album's first images (so it never 404s after a sync).
+      const heroImgs = document.querySelectorAll('.hero-cell img');
+      items.slice(0, heroImgs.length).forEach((it, i) => { heroImgs[i].src = it.file; heroImgs[i].alt = it.alt || ''; });
+      // Main grid.
+      galleryGrid.innerHTML = '';
+      items.forEach((it, i) => {
+        const d = document.createElement('div');
+        d.className = ('item ' + SPANS[i % SPANS.length] + (i % 7 === 0 ? ' accent' : '')).replace(/\s+/g, ' ').trim();
+        d.dataset.file = it.file;
+        const img = document.createElement('img');
+        img.src = it.file; img.alt = it.alt || ''; img.loading = 'lazy';
+        d.appendChild(img);
+        galleryGrid.appendChild(d);
+      });
+    }
+
+    await renderGallery();
+
+    // Curator mode: drag-to-reorder, unlocked via the terminal `login` command.
+    function enableCurator() {
+      curatorMode = true; document.body.classList.add('curator');
+      document.querySelectorAll('#gallery-grid .item').forEach(it => it.setAttribute('draggable', 'true'));
+    }
+    function disableCurator() {
+      curatorMode = false; document.body.classList.remove('curator');
+      document.querySelectorAll('#gallery-grid .item').forEach(it => it.removeAttribute('draggable'));
+    }
+    let dragEl = null;
+    if (galleryGrid) {
+      galleryGrid.addEventListener('dragstart', e => {
+        if (!curatorMode) return;
+        dragEl = e.target.closest('.item'); if (dragEl) dragEl.classList.add('dragging');
+        if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+      });
+      galleryGrid.addEventListener('dragend', () => {
+        if (!dragEl) return; dragEl.classList.remove('dragging'); dragEl = null;
+        saveCuratorOrder(currentOrder());
+      });
+      galleryGrid.addEventListener('dragover', e => {
+        if (!curatorMode || !dragEl) return; e.preventDefault();
+        const over = e.target.closest('.item'); if (!over || over === dragEl) return;
+        const r = over.getBoundingClientRect();
+        const after = (e.clientY - r.top) / r.height > 0.5;
+        galleryGrid.insertBefore(dragEl, after ? over.nextSibling : over);
+      });
+    }
 
     /* ── Film grain ── */
     const gc = document.createElement('canvas');
@@ -1251,7 +1355,7 @@ body.t-cyber { --accent: #00f0ff; --accent2: #ff00aa; --text-data: #00f0ff; }
     function closeV() { viewer.classList.remove('active'); document.body.style.overflow = ''; }
     function navV(d) { ci = (ci + d + allImages.length) % allImages.length; showV(); vImg.style.animation = 'none'; vImg.offsetHeight; vImg.style.animation = ''; }
 
-    allImages.forEach(img => { img.style.cursor = 'pointer'; img.addEventListener('click', () => openV(img)); });
+    allImages.forEach(img => { img.style.cursor = 'pointer'; img.addEventListener('click', () => { if (curatorMode) return; openV(img); }); });
     viewer.addEventListener('click', e => { if (e.target === viewer) closeV(); });
     document.getElementById('viewer-close').addEventListener('click', closeV);
     document.getElementById('viewer-prev').addEventListener('click', e => { e.stopPropagation(); navV(-1); });
@@ -1378,6 +1482,46 @@ body.t-cyber { --accent: #00f0ff; --accent2: #ff00aa; --text-data: #00f0ff; }
           const n = parseInt(arg) - 1;
           if (n >= 0 && n < allImages.length) { ci = n; showV(); viewer.classList.add('active'); document.body.style.overflow = 'hidden'; tPrint('<span class="info">opening image #' + (n+1) + '</span>'); toggleTerm(); }
           else tPrint('<span class="err">open: invalid (1-' + allImages.length + ')</span>');
+        },
+        // ── Hidden: curator mode (Aaron only). Not listed in help. ──
+        login() {
+          if (curatorMode) { tPrint('<span class="info">already in curator mode.</span>'); return; }
+          if (!arg) { tPrint('usage: <span class="hl">login &lt;passphrase&gt;</span>'); return; }
+          if (arg === CURATOR_PASS) {
+            enableCurator();
+            tPrint('<span class="info">access granted. welcome back, Aaron.</span>');
+            tPrint('drag photos to reorder · <span class="hl">export</span> copies the order · <span class="hl">logout</span> exits');
+            tPrint('<span class="dim">preview is local to this browser — to publish, apply the order in Lightroom.</span>');
+            toggleTerm();
+          } else {
+            tPrint('<span class="err">login: authentication failed</span>');
+          }
+        },
+        logout() {
+          if (!curatorMode) { tPrint('not logged in.'); return; }
+          disableCurator(); tPrint('<span class="info">curator mode locked.</span>');
+        },
+        export() {
+          const order = currentOrder();
+          if (!order.length) { tPrint('<span class="err">no images loaded.</span>'); return; }
+          const json = JSON.stringify(order, null, 2);
+          if (navigator.clipboard) navigator.clipboard.writeText(json).then(function(){}, function(){});
+          try {
+            const blob = new Blob([json], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = 'gallery-order.json';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+          } catch (e) {}
+          tPrint('<span class="info">order (' + order.length + ') saved as gallery-order.json + copied to clipboard.</span>');
+          tPrint('<span class="dim">publish: commit gallery-order.json to the repo (or open a PR) — it overrides album order for everyone.</span>');
+          tPrint('<span class="dim">then run `reset order` to clear this browser’s local draft.</span>');
+        },
+        reset() {
+          if (arg === 'order') {
+            localStorage.removeItem('lr_curator_order');
+            tPrint('<span class="info">saved order cleared — reload to see the published order.</span>');
+          } else tPrint('usage: <span class="hl">reset order</span>');
         },
         whoami() {
           tPrint('\n<span class="hl">AARON BISLA</span>');
