@@ -7,8 +7,12 @@ name: Sync gallery from Lightroom
 # apply in Lightroom. Next run picks up the new album order.
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'   # every 6h; no-ops (no PR) when the album is unchanged
+  # PAUSED: the configured album_url is a public-profile gallery (/gallery/<id>),
+  # which the importer does not support (no albumAttributes; assets endpoint returns
+  # empty). Re-enable this schedule once album_url points at a shared-album link
+  # (lightroom.adobe.com/shares/<id> or an adobe.ly/... short link).
+  # schedule:
+  #   - cron: '0 */6 * * *'   # every 6h; no-ops (no PR) when the album is unchanged
   workflow_dispatch: {}      # manual "Run workflow" button for an immediate sync
 
 permissions:
